@@ -1,8 +1,12 @@
-import Socket from "@/web/core/socket";
+import useLogs from "@/web/hooks/useLogs";
+import useGlobalStore from "@/web/store/global";
 import { useStreamsStore } from "@/web/store/streams";
+import { WebSocketEvents } from "@melo/common/constants";
 import { useEffect, useRef, useState } from "react";
 
-import { WebSocketEvents } from "@melo/common/constants";
+interface StreamsProvider {
+  children: React.ReactNode;
+}
 
 const configuration = {
   iceServers: [
@@ -10,14 +14,15 @@ const configuration = {
   ]
 };
 
-let __isCalled = false;
-
-const useStreams = (socket: Socket | null, addNewLog?: (log: Log) => void) => {
+export default function Streams({
+  children,
+}: StreamsProvider) {
   const store = useStreamsStore();
+  const { socket } = useGlobalStore();
+  const { addNewLog } = useLogs();
+  
   const peersRef = useRef(new Map<string, RTCPeerConnection>());
   const [loading, setLoading] = useState(true);
-
-  if (!socket) return {...store, loading};
 
   const createPeerConnection = (userId: string, stream: MediaStream): RTCPeerConnection => {
     const pc = new RTCPeerConnection(configuration);
@@ -52,14 +57,8 @@ const useStreams = (socket: Socket | null, addNewLog?: (log: Log) => void) => {
       console.error("Error creating offer:", e);
     }
   };
-
+  
   useEffect(() => {
-    if (__isCalled) {
-      console.error("useStreams should only be called once");
-      return;
-    }
-    __isCalled = true;
-    
     if (!socket) return;
 
     const init = async () => {
@@ -132,17 +131,14 @@ const useStreams = (socket: Socket | null, addNewLog?: (log: Log) => void) => {
       }
     };
 
-    init().then(() => setLoading(true))
+    init().then(() => setLoading(false))
 
     return () => {
       store.cleanup();
     };
   }, [socket]);
-
-  return {
-    ...store,
-    loading
-  };
-};
-
-export default useStreams;
+  
+  if(loading) return <div>Streams Loading...</div>
+  
+  return children;
+}
