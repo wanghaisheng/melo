@@ -50,6 +50,9 @@ importers:
 
   apps/ws:
     dependencies:
+      '@melo/types':
+        specifier: workspace:^
+        version: link:../../packages/types
       partysocket:
         specifier: ^1.0.2
         version: 1.0.3
@@ -60,6 +63,8 @@ importers:
       typescript:
         specifier: ^5.5.4
         version: 5.7.2
+
+  packages/types: {}
 
 packages:
 

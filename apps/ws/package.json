@@ -6,7 +6,8 @@
     "deploy": "partykit deploy"
   },
   "dependencies": {
-    "partysocket": "^1.0.2"
+    "partysocket": "^1.0.2",
+    "@melo/types": "workspace:^"
   },
   "devDependencies": {
     "partykit": "^0.0.110",

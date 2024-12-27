@@ -1,0 +1,5 @@
+{
+  "name": "@melo/types",
+  "author": "saphalpdyl",
+  "main": "./src/index.ts"
+}

@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "description": "Interactive virtual spaces for remote teams to work, play, and connect.",
   "scripts": {
+    "dev": "pnpm run --parallel --aggregate-output dev"
   },
   "author": "saphalpdyl",
   "license": "MIT"
