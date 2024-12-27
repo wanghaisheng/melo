@@ -1,0 +1,6 @@
+{
+  "name": "@melo/common",
+  "author": "Saphal Poudyal",
+  "license": "MIT",
+  "main": "./index.ts"
+}

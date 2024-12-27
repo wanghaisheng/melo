@@ -1,57 +1,60 @@
 import type * as Party from "partykit/server";
-import BasePartyServer from "./core/server-base";
 
-import type { UserData } from "@melo/types";
+import BasePartyServer from "@/ws/core/server-base";
+import { WebSocketEvents } from "@melo/common/constants";
+
+import type { PlayerData } from "@melo/types";
 
 export default class Server extends BasePartyServer implements Party.Server {
-  private userData = new Map<string, UserData>();
+  private userData = new Map<string, PlayerData>();
   
   constructor(readonly room: Party.Room) {
     super(room);
 
-    this.on("offer", (data, conn) => {
+
+    this.on(WebSocketEvents.P2P_OFFER, (data, conn) => {
       // Offer by broadcasting to the specific user only
-      this.emitTo("offer",{
+      this.emitTo(WebSocketEvents.P2P_OFFER,{
         offer: data.offer,
         from: conn.id,
       }, [data.to]);
 
     });
 
-    this.on("answer", ({answer, to},conn) => {
-      this.emitTo("answer", {
+    this.on(WebSocketEvents.P2P_ANSWER, ({answer, to},conn) => {
+      this.emitTo(WebSocketEvents.P2P_ANSWER, {
         answer,
         from: conn.id,
       }, [to])
     });
 
-    this.on("ice-candidate", ({ candidate, to }, conn) => {
-      this.emitTo("ice-candidate", {
+    this.on(WebSocketEvents.P2P_ICE_CANDIDATE, ({ candidate, to }, conn) => {
+      this.emitTo(WebSocketEvents.P2P_ICE_CANDIDATE, {
         candidate,
         from: conn.id,
       }, [to]);
     });
 
     
-    this.on("disconnect", (_, conn) => {
-      this.emitAll("user-left", {
+    this.on(WebSocketEvents.P2P_DISCONNECT, (_, conn) => {
+      this.emitAll(WebSocketEvents.USER_LEFT, {
         id: conn.id,
       });
     });
 
-    this.on("player-data-update", (data, conn) => {
+    this.on(WebSocketEvents.PLAYER_DATA_UPDATE, (data, conn) => {
       // Set the individual player's position and then signal the update to all
       // We are sure that the userData entry is already done
       this.userData.set(conn.id, data);      
 
-      this.emitWithout("global-player-data-update", {
+      this.emitWithout(WebSocketEvents.GLOBAL_PLAYER_DATA_UPDATE, {
         data: Object.fromEntries(this.userData)
       }, []);
     })
   }
 
   onClose(connection: Party.Connection): void | Promise<void> {
-    this.emitAll("user-left", {
+    this.emitAll(WebSocketEvents.USER_LEFT, {
       id: connection.id,
     });
 
@@ -60,7 +63,7 @@ export default class Server extends BasePartyServer implements Party.Server {
       this.userData.delete(connection.id);
     }
 
-    this.emitAll("global-player-data-update", {
+    this.emitAll(WebSocketEvents.GLOBAL_PLAYER_DATA_UPDATE, {
       data: Object.fromEntries(this.userData),
     });
   };
@@ -79,15 +82,15 @@ export default class Server extends BasePartyServer implements Party.Server {
     }
 
     
-    this.emitAll("global-player-data-update", {
+    this.emitAll(WebSocketEvents.GLOBAL_PLAYER_DATA_UPDATE, {
       data: Object.fromEntries(this.userData),
     });
     
-    this.emitWithout("user-joined", {
+    this.emitWithout(WebSocketEvents.USER_JOINED, {
       id: connection.id,
     }, []);
 
-    this.emitTo("existing-users", {
+    this.emitTo(WebSocketEvents.EXISTING_USERS, {
       "users": this.getConnectionIds([connection.id]),
     }, [connection.id]);
   }

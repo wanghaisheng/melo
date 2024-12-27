@@ -4,6 +4,7 @@ import Socket from "../core/socket";
 import usePlayerStore from "@/web/store/players";
 
 import type { PlayerData } from "@melo/types";
+import { WebSocketEvents } from "@melo/common/constants";
 
 // This is a setup hooks, not to be used directly in components
 let __isCalled = false;
@@ -19,17 +20,17 @@ const usePlayers = (socket: Socket | null) => {
 
   const [ loading, setLoading ] = useState(true);
   
+  if(!socket) return console.error("Socket is not initialized");
+  
   useEffect(() => {
     // Ensuring one-time-call behavior
     if (__isCalled) return console.error("usePlayers should only be called once");
     __isCalled = true;
     
     setLoading(true);
-    if(!socket) return console.error("Socket is not initialized");
+    if (socket.isRegistered(WebSocketEvents.GLOBAL_PLAYER_DATA_UPDATE)) return;
     
-    if (socket.isRegistered("global-player-data-update")) return;
-    
-    socket.on("global-player-data-update", ({ data }) => {
+    socket.on(WebSocketEvents.GLOBAL_PLAYER_DATA_UPDATE, ({ data }) => {
       // Data comes in as Object [string]: PlayerData, we need to convert to PlayerData[]
       const players = Object.values(data as Record<string, PlayerData>);
       setPlayers(players);

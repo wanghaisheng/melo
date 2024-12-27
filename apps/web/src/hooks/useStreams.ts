@@ -1,6 +1,8 @@
 import Socket from "@/web/core/socket";
 import { useStreamsStore } from "@/web/store/streams";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+
+import { WebSocketEvents } from "@melo/common/constants";
 
 const configuration = {
   iceServers: [
@@ -10,9 +12,12 @@ const configuration = {
 
 let __isCalled = false;
 
-const useStreams = (socket: Socket | null, addNewLog?: (log: { data: string, level: string }) => void) => {
+const useStreams = (socket: Socket | null, addNewLog?: (log: Log) => void) => {
   const store = useStreamsStore();
   const peersRef = useRef(new Map<string, RTCPeerConnection>());
+  const [loading, setLoading] = useState(true);
+
+  if (!socket) return {...store, loading};
 
   const createPeerConnection = (userId: string, stream: MediaStream): RTCPeerConnection => {
     const pc = new RTCPeerConnection(configuration);
@@ -20,7 +25,7 @@ const useStreams = (socket: Socket | null, addNewLog?: (log: { data: string, lev
 
     pc.onicecandidate = e => {
       if (e.candidate && socket) {
-        socket.emit('ice-candidate', {
+        socket.emit(WebSocketEvents.P2P_ICE_CANDIDATE, {
           candidate: e.candidate,
           to: userId,
         });
@@ -42,7 +47,7 @@ const useStreams = (socket: Socket | null, addNewLog?: (log: { data: string, lev
     try {
       const offer = await pc.createOffer();
       await pc.setLocalDescription(offer);
-      socket?.emit('offer', { offer, to: userId });
+      socket?.emit(WebSocketEvents.P2P_OFFER, { offer, to: userId });
     } catch(e) {
       console.error("Error creating offer:", e);
     }
@@ -66,11 +71,11 @@ const useStreams = (socket: Socket | null, addNewLog?: (log: { data: string, lev
         
         useStreamsStore.setState({ localStream: stream, loading: false });
 
-        socket.on("existing-users", ({ users }: { users: string[] }) => {
+        socket.on(WebSocketEvents.EXISTING_USERS, ({ users }: { users: string[] }) => {
           users.forEach(id => initiatePeerConnection(id, stream));
         });
 
-        socket.on("user-joined", ({ id }) => {
+        socket.on(WebSocketEvents.USER_JOINED, ({ id }) => {
           if (!peersRef.current.has(id)) {
             createPeerConnection(id, stream);
           }
@@ -80,7 +85,7 @@ const useStreams = (socket: Socket | null, addNewLog?: (log: { data: string, lev
           });
         });
 
-        socket.on("offer", async ({ offer, from }) => {
+        socket.on(WebSocketEvents.P2P_OFFER, async ({ offer, from }) => {
           let pc = peersRef.current.get(from);
           if (!pc) {
             pc = createPeerConnection(from, stream);
@@ -88,24 +93,24 @@ const useStreams = (socket: Socket | null, addNewLog?: (log: { data: string, lev
           await pc.setRemoteDescription(new RTCSessionDescription(offer));
           const answer = await pc.createAnswer();
           await pc.setLocalDescription(answer);
-          socket.emit("answer", { answer, to: from });
+          socket.emit(WebSocketEvents.P2P_ANSWER, { answer, to: from });
         });
 
-        socket.on("answer", async ({ answer, from }) => {
+        socket.on(WebSocketEvents.P2P_ANSWER, async ({ answer, from }) => {
           const pc = peersRef.current.get(from);
           if (pc) {
             await pc.setRemoteDescription(new RTCSessionDescription(answer));
           }
         });
 
-        socket.on("ice-candidate", async ({ candidate, from }) => {
+        socket.on(WebSocketEvents.P2P_ICE_CANDIDATE, async ({ candidate, from }) => {
           const pc = peersRef.current.get(from);
           if (pc) {
             await pc.addIceCandidate(new RTCIceCandidate(candidate));
           }
         });
 
-        socket.on("user-left", ({ id }) => {
+        socket.on(WebSocketEvents.USER_LEFT, ({ id }) => {
           if (peersRef.current.has(id)) {
             peersRef.current.get(id)?.close();
             peersRef.current.delete(id);
@@ -127,7 +132,7 @@ const useStreams = (socket: Socket | null, addNewLog?: (log: { data: string, lev
       }
     };
 
-    init();
+    init().then(() => setLoading(true))
 
     return () => {
       store.cleanup();
@@ -136,6 +141,7 @@ const useStreams = (socket: Socket | null, addNewLog?: (log: { data: string, lev
 
   return {
     ...store,
+    loading
   };
 };
 

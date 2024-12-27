@@ -10,6 +10,9 @@ importers:
 
   apps/web:
     dependencies:
+      '@melo/common':
+        specifier: workspace:^
+        version: link:../../packages/common
       '@melo/types':
         specifier: workspace:^
         version: link:../../packages/types
@@ -65,6 +68,9 @@ importers:
 
   apps/ws:
     dependencies:
+      '@melo/common':
+        specifier: workspace:^
+        version: link:../../packages/common
       '@melo/types':
         specifier: workspace:^
         version: link:../../packages/types
@@ -78,6 +84,8 @@ importers:
       typescript:
         specifier: ^5.5.4
         version: 5.7.2
+
+  packages/common: {}
 
   packages/types: {}
 
