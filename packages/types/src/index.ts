@@ -1,4 +1,4 @@
-export type UserData = {
+export type PlayerData = {
   connectionId: string;
   username: string;
   displayName: string;
