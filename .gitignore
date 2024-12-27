@@ -1,0 +1,59 @@
+# Node.js
+node_modules/
+npm-debug.log
+yarn-error.log
+package-lock.json
+yarn.lock
+
+# Next.js build output
+.next/
+out/
+.vercel/
+
+# Production build output
+build/
+dist/
+
+# Next.js environment files
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Next.js cache
+.next/cache/
+
+# TypeScript
+*.tsbuildinfo
+tsconfig.tsbuildinfo
+
+# Logs
+logs/
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE / Editor directories and files
+.vscode/
+.idea/
+
+# PartyKit WebSocket server
+# Logs
+*.log
+
+# Other system files
+*.swp
+
+# Testing and coverage outputs
+coverage/
+*.lcov
+
+# Dependency directories for the backend if any (e.g., for PartyKit)
+.pnpm/
+
+# Other relevant files
+.env
+.env.*.local
+*.tgz

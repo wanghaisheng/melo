@@ -1,0 +1,9 @@
+{
+  "name": "melo",
+  "version": "0.1.0",
+  "description": "Interactive virtual spaces for remote teams to work, play, and connect.",
+  "scripts": {
+  },
+  "author": "saphalpdyl",
+  "license": "MIT"
+}
