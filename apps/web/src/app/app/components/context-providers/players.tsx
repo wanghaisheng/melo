@@ -1,3 +1,4 @@
+import Loader from "@/web/app/app/components/loader";
 import useGlobalStore from "@/web/store/global";
 import usePlayerStore from "@/web/store/players";
 import { PlayerData } from "@melo/types";
@@ -39,7 +40,9 @@ export default function PlayersProvider({
       setPlayers(players);
     });
 
-    setLoading(false);
+
+    // Artificially create a very small delay to show loading realistically
+    new Promise((r,_) => setTimeout(r, 300)).then(() => setLoading(false));
   }, [socket]);
 
   const handleUpdatePlayerData = (data: PlayerData) => {
@@ -81,7 +84,8 @@ export default function PlayersProvider({
     });
   }
 
-  if ( loading ) return <div>Players Loading...</div>
+  // if ( loading ) return <div>Players Loading...</div>
+  if ( loading ) return <Loader title="Players Loading..." subtitle="The server is managing players connection." progress={40}/>
   
   return <playersContext.Provider value={{
     handleUpdatePlayerData,

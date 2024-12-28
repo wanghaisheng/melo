@@ -7,7 +7,7 @@ interface SocketConnectionProps {
 }
 
 export default function SocketConnection({ children } : SocketConnectionProps) {
-  const { socket, setSocket } = useGlobalStore();
+  const { setSocket } = useGlobalStore();
 
   useEffect(() => {
     setSocket(new Socket({
@@ -16,9 +16,5 @@ export default function SocketConnection({ children } : SocketConnectionProps) {
     }));
   }, []);
 
-  useEffect(() => {
-
-  }, [socket]);
-  
   return children;
 }

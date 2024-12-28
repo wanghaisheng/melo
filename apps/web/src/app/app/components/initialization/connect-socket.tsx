@@ -1,3 +1,4 @@
+import Loader from "@/web/app/app/components/loader";
 import useGlobalStore from "@/web/store/global";
 import usePlayerStore from "@/web/store/players";
 import { useEffect } from "react";
@@ -18,8 +19,8 @@ export default function ConnectSocket({
     socket.connect();
   }, [socket]);
 
-  console.log(players.length);
-  if (!socket || players.length < 1) return <div>Socket Loading....</div>
+  // if (!socket || players.length < 1) return <div>Socket Loading....</div>
+  if (!socket || players.length < 1) return <Loader title="Socket Loading..." subtitle="The server is configuring socket connections." progress={60} />
   
   return children;
 }

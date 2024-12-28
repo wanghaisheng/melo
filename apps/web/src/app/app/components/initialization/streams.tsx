@@ -1,3 +1,4 @@
+import Loader from "@/web/app/app/components/loader";
 import useLogs from "@/web/hooks/useLogs";
 import useGlobalStore from "@/web/store/global";
 import { useStreamsStore } from "@/web/store/streams";
@@ -138,7 +139,8 @@ export default function Streams({
     };
   }, [socket]);
   
-  if(loading) return <div>Streams Loading...</div>
+  // if(loading) return <div>Streams Loading...</div>
+  if ( loading ) return <Loader title="Streams Loading..." subtitle="The server is managing peer-to-peer connections" progress={20}/>
   
   return children;
 }
