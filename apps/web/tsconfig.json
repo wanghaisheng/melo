@@ -19,7 +19,8 @@
       }
     ],
     "paths": {
-      "@/web/*": ["./src/*"]
+      "@/web/*": ["./src/*"],
+      "@/web/env": ["./src/env/index"]
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],

@@ -2,6 +2,8 @@ import useGlobalStore from "@/web/store/global";
 import Socket from "@/web/core/socket";
 import React, { useEffect } from "react";
 
+import { PARTYKIT_HOST } from "@/web/env";
+
 interface SocketConnectionProps {
   children: React.ReactNode;
   room: string;
@@ -12,7 +14,7 @@ export default function SocketConnection({ children, room } : SocketConnectionPr
 
   useEffect(() => {
     setSocket(new Socket({
-      host: "http://localhost:1999/",
+      host: PARTYKIT_HOST,
       room,
     }));
   }, []);

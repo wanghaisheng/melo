@@ -1,11 +1,12 @@
-import React from "react";
 import { Canvas } from "@react-three/fiber";
-import { MapControls, OrthographicCamera, Stats, useGLTF } from "@react-three/drei";
+import { MapControls, OrthographicCamera, Stats } from "@react-three/drei";
 
 import Players from "@/web/app/app/components/three-components/players";
 import ModelsLoader from "@/web/app/app/components/models-loader";
+import useGlobalStore from "@/web/store/global";
 
 export default function Level() {
+  const { modelsLoading } = useGlobalStore();
   
   return (
     <Canvas 
@@ -33,7 +34,14 @@ export default function Level() {
               hideShadow: true,
             }
           ]} 
-          progress={80}
+        />
+
+        {/* Disable Map Controls while loading */}
+        <MapControls 
+          enableRotate={false}
+          minZoom={30}
+          zoomSpeed={3}
+          enablePan={!modelsLoading}
         />
 
         <color attach="background" args={['#3B8B5D']} />
@@ -75,12 +83,6 @@ export default function Level() {
         {/* </Suspense> */}
         
         <gridHelper />
-        <MapControls 
-          enableRotate={false}
-          minZoom={30}
-          // maxZoom={100}
-          zoomSpeed={3}
-        />
 
         {/* Players */}
         <Players />

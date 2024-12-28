@@ -1,6 +1,7 @@
-import Loader from "@/web/app/app/components/loader";
+import { Suspense, useEffect, useState } from "react";
 import { Html, useGLTF } from "@react-three/drei";
-import { Suspense } from "react";
+import Loader from "@/web/app/app/components/loader";
+import useGlobalStore from "@/web/store/global";
 
 export interface ModelsLoadConfiguration {
   path: string;
@@ -16,7 +17,6 @@ export interface ModelsLoadConfiguration {
 
 interface ModelsLoaderProps {
   models: ModelsLoadConfiguration[]; 
-  progress: number;
 }
 
 function Model({
@@ -39,15 +39,36 @@ function Model({
   </group>;
 }
 
+// This component unloads when the model is loaded, and the fallback(this component) is unloaded.
+function ModelLoaderFallback({
+  handleIncreaseLoadCount,
+}: {
+  handleIncreaseLoadCount: () => void,
+}) {
+  
+  useEffect(() => {
+    return () => {
+      handleIncreaseLoadCount();
+    }
+  }, [])
+  
+  return <Html fullscreen>
+    <Loader progress={70} title="Models Loading..." subtitle={`The client is loading environments.`} />
+  </Html> ;
+}
 
 export default function ModelsLoader({
   models,
-  progress,
 }: ModelsLoaderProps) {
+  const [loadCount, setLoadCount] = useState(0);
+  const { setModelsLoading } = useGlobalStore();
+
+  useEffect(() => {
+    if (loadCount >= models.length) setModelsLoading(false);
+  }, [loadCount]);
+
   return models.map((m, i) => {
-    return <Suspense fallback={<Html fullscreen className="z-[100000000]">
-      <Loader progress={progress} title="Models Loading..." subtitle={`The client is loading environments.`} />
-    </Html>}>
+    return <Suspense fallback={<ModelLoaderFallback handleIncreaseLoadCount={() => setLoadCount(c => c + 1)} />}>
       <Model path={m.path} hideShadow={m.hideShadow ?? false} name={m.name} props={m.props}/>
     </Suspense>
   })
