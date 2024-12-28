@@ -1,9 +1,11 @@
 import { Canvas } from "@react-three/fiber";
 import { MapControls, OrthographicCamera, Stats } from "@react-three/drei";
 
+import useGlobalStore from "@/web/store/global";
+
 import Players from "@/web/app/app/components/three-components/players";
 import ModelsLoader from "@/web/app/app/components/models-loader";
-import useGlobalStore from "@/web/store/global";
+import Ground from "@/web/app/app/components/three-components/ground";
 
 export default function Level() {
   const { modelsLoading } = useGlobalStore();
@@ -35,6 +37,8 @@ export default function Level() {
             }
           ]} 
         />
+
+        <Ground />
 
         {/* Disable Map Controls while loading */}
         <MapControls 
