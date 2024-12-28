@@ -53,8 +53,9 @@ export default function Player({
         position={[0,0,0]} 
         style={{
           pointerEvents: "none",
-          transition: "all 0.1s ease-out" // Optional: smooth size changes
+          transition: "all 0.1s ease-out", // Optional: smooth size changes
         }}
+        zIndexRange={[0,10]}
       >
         <div 
           style={{

@@ -4,6 +4,7 @@ import { MapControls, OrbitControls, OrthographicCamera, Stats, useGLTF } from "
 import { Suspense } from "react";
 
 import Players from "@/web/app/app/components/three-components/players";
+import ModelsLoader from "@/web/app/app/components/models-loader";
 
 export default function Level() {
   
@@ -18,6 +19,25 @@ export default function Level() {
         }}
         >
         <Stats />
+        <ModelsLoader 
+          models={[
+            {
+              path: "/housing.glb",
+              name: "Buildings",
+              props: {
+                position: [0,0.5,0]
+              }
+            },
+            {
+              path: "/test.glb",
+              name: "Environment",
+              hideShadow: true,
+            }
+          ]} 
+          minProgress={60} 
+          maxProgress={100}          
+        />
+
         <color attach="background" args={['#3B8B5D']} />
         <OrthographicCamera
           makeDefault
@@ -50,20 +70,20 @@ export default function Level() {
         {/* Subtle fill light */}
         <ambientLight intensity={0.4} />
         
-        <Suspense fallback={null}>
+        {/* <Suspense fallback={null}> */}
           {/* <Housing />
           <Environment />
           <Ground /> */}
-        </Suspense>
+        {/* </Suspense> */}
         
         <gridHelper />
-        <MapControls 
+        {/* <MapControls 
           enableRotate={false}
           minZoom={30}
           // maxZoom={100}
           zoomSpeed={3}
-        />
-        {/* <OrbitControls /> */}
+        /> */}
+        <OrbitControls />
 
         {/* Players */}
         <Players />

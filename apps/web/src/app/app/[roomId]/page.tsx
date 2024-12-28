@@ -1,5 +1,6 @@
 "use client";
 
+import ChatLogs from "@/web/app/app/components/chat-logs";
 import PlayersProvider from "@/web/app/app/components/context-providers/players";
 import ConnectSocket from "@/web/app/app/components/initialization/connect-socket";
 import SocketConnection from "@/web/app/app/components/initialization/socket";
@@ -16,6 +17,7 @@ export default function Page() {
           <ConnectSocket>
             <div className="w-screen h-screen relative">
               <VideoSection />
+              <ChatLogs />
               <Level />
             </div>
           </ConnectSocket>
