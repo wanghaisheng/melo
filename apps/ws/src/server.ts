@@ -81,7 +81,6 @@ export default class Server extends BasePartyServer implements Party.Server {
       })
     }
 
-    
     this.emitAll(WebSocketEvents.GLOBAL_PLAYER_DATA_UPDATE, {
       data: Object.fromEntries(this.userData),
     });
