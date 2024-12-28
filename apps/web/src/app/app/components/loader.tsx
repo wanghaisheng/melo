@@ -12,7 +12,9 @@ export default function Loader({
   progress,
 }: LoaderProps) {
 
-  return <div className="h-screen w-screen z-60 backdrop-blur-sm flex flex-col gap-2 items-center justify-center bg-white text-gray-700">
+
+
+  return <div className="h-screen w-screen z-60 backdrop-blur-md flex flex-col gap-2 items-center justify-center bg-white/40 text-gray-700">
     <Image src="/melo.svg" alt="Melo Logo" width={600} height={600}/>
     <h1 className="text-2xl font-bold">{title}</h1>
     <h2 className="text-lg">{subtitle}</h2>
@@ -25,6 +27,5 @@ export default function Loader({
       ></div>
     </div>
     <h1 className="text-4xl text-gray-300 font-bold">{progress} %</h1>
-
   </div>;
 }

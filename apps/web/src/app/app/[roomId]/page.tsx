@@ -11,18 +11,18 @@ import VideoSection from "@/web/app/app/components/video-section";
 export default function Page() {
   
   return (
-    <SocketConnection>
-      <Streams>
-        <PlayersProvider>
-          <ConnectSocket>
-            <div className="w-screen h-screen relative">
-              <VideoSection />
-              <ChatLogs />
-              <Level />
-            </div>
-          </ConnectSocket>
-        </PlayersProvider>
-      </Streams>
-    </SocketConnection>
+    <div className="w-screen h-screen relative bg-white">
+      <SocketConnection>
+        <Streams>
+          <PlayersProvider>
+            <ConnectSocket>
+                <VideoSection />
+                <ChatLogs />
+                <Level />
+            </ConnectSocket>
+          </PlayersProvider>
+        </Streams>
+      </SocketConnection>
+    </div>
   );
 }

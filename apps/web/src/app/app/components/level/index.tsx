@@ -1,7 +1,6 @@
 import React from "react";
 import { Canvas } from "@react-three/fiber";
-import { MapControls, OrbitControls, OrthographicCamera, Stats, useGLTF } from "@react-three/drei";
-import { Suspense } from "react";
+import { MapControls, OrthographicCamera, Stats, useGLTF } from "@react-three/drei";
 
 import Players from "@/web/app/app/components/three-components/players";
 import ModelsLoader from "@/web/app/app/components/models-loader";
@@ -34,8 +33,7 @@ export default function Level() {
               hideShadow: true,
             }
           ]} 
-          minProgress={60} 
-          maxProgress={100}          
+          progress={80}
         />
 
         <color attach="background" args={['#3B8B5D']} />
@@ -77,13 +75,12 @@ export default function Level() {
         {/* </Suspense> */}
         
         <gridHelper />
-        {/* <MapControls 
+        <MapControls 
           enableRotate={false}
           minZoom={30}
           // maxZoom={100}
           zoomSpeed={3}
-        /> */}
-        <OrbitControls />
+        />
 
         {/* Players */}
         <Players />

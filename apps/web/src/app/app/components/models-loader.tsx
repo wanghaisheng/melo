@@ -16,9 +16,7 @@ export interface ModelsLoadConfiguration {
 
 interface ModelsLoaderProps {
   models: ModelsLoadConfiguration[]; 
-
-  minProgress: number;
-  maxProgress: number;
+  progress: number;
 }
 
 function Model({
@@ -44,11 +42,11 @@ function Model({
 
 export default function ModelsLoader({
   models,
+  progress,
 }: ModelsLoaderProps) {
-  
   return models.map((m, i) => {
     return <Suspense fallback={<Html fullscreen className="z-[100000000]">
-      <Loader progress={70} title="Models Loading..." subtitle="The client is loading environments." />
+      <Loader progress={progress} title="Models Loading..." subtitle={`The client is loading environments.`} />
     </Html>}>
       <Model path={m.path} hideShadow={m.hideShadow ?? false} name={m.name} props={m.props}/>
     </Suspense>
