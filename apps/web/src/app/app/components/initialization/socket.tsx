@@ -4,15 +4,16 @@ import React, { useEffect } from "react";
 
 interface SocketConnectionProps {
   children: React.ReactNode;
+  room: string;
 }
 
-export default function SocketConnection({ children } : SocketConnectionProps) {
+export default function SocketConnection({ children, room } : SocketConnectionProps) {
   const { setSocket } = useGlobalStore();
 
   useEffect(() => {
     setSocket(new Socket({
       host: "http://localhost:1999/",
-      room: "my-test-room",
+      room,
     }));
   }, []);
 
