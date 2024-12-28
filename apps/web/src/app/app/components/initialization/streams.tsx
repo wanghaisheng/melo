@@ -141,6 +141,6 @@ export default function Streams({
   
   // if(loading) return <div>Streams Loading...</div>
   if ( loading ) return <Loader title="Streams Loading..." subtitle="The server is managing peer-to-peer connections" progress={20}/>
-  
+    
   return children;
 }

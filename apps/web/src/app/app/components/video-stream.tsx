@@ -1,3 +1,4 @@
+import { CameraOff, MicOff } from "lucide-react";
 import { useEffect, useRef } from "react";
 import { Vector3 } from "three";
 
@@ -47,31 +48,40 @@ export default function VideoStream({
     videoRef.current.srcObject = stream;
   }, [stream]);
 
-  if (!stream) {
-    return (
-      <div className="relative w-48 h-36 bg-gray-800 rounded-lg flex items-center justify-center">
-        {isLocal && <span className="text-white">You</span>}
-      </div>
-    );
-  }
-
   return (
     <>
-      <video
-        ref={videoRef}
-        autoPlay
-        playsInline
-        muted={isLocal}
-        className="w-full h-full object-cover"
-        style={{
-          transform: `scaleX(${isLocal ? -1 : 1})`,
-        }}
-      />
+      {
+        !stream || stream.getVideoTracks().length == 0 ? (
+          <div className="relative w-full h-full bg-gray-950 rounded-lg flex items-center justify-center">
+            <CameraOff />
+          </div>
+        ) : (
+          <video
+            ref={videoRef}
+            autoPlay
+            playsInline
+            muted={isLocal}
+            className="w-full h-full object-cover rounded-lg"
+            style={{
+              transform: `scaleX(${isLocal ? -1 : 1})`,
+            }}
+          />
+        )
+      }
       {!hideName && isLocal && (
         <div className="absolute bottom-2 left-2 bg-black/50 px-2 py-1 rounded text-white text-sm">
           You
         </div>
       )}
+
+      {/* Check for audio mute */}
+      {
+        (stream === null || stream.getAudioTracks().length == 0) && (
+          <div className="absolute bottom-2 right-2 text-red-500">
+            <MicOff size={12} />
+          </div>
+        )
+      }
     </>
   );
 }

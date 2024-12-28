@@ -16,7 +16,7 @@ function Ground() {
     // Stop propagation to prevent HTML elements from intercepting
     event.stopPropagation();
 
-    // Check for mobile devices
+    // Enable mouse button if the platform is mobile(touch-controlled)
     if ( !checkMobilePlatform() && event.button !== 2 ) return;
     
     // Check if the click is directly on the ground mesh

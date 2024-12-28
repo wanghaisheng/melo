@@ -44,6 +44,7 @@ export default function Player({
   });
 
   return (
+    //@ts-ignore
     <animated.mesh 
       key={player.connectionId}
       castShadow
@@ -66,7 +67,6 @@ export default function Player({
               -z-10 -translate-x-1/2 -translate-y-[100%] 
               border-2 ${isLocal ? "border-pink-400" : "border-white"} 
               rounded-xl 
-              overflow-hidden
               `}
         >
           <VideoStream 
@@ -78,6 +78,7 @@ export default function Player({
           />
         </div>
       </Html>
+    {/* @ts-ignore */}
     </animated.mesh>
   );
 }
