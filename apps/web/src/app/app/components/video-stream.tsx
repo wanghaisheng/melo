@@ -54,7 +54,7 @@ export default function VideoStream({
     <>
       {
         stream?.getVideoTracks()[0].enabled === false ? (
-          <div className="relative w-full h-full rounded-lg flex items-center justify-center text-white">
+          <div className="relative w-full h-full rounded-lg flex items-center justify-center text-white bg-black">
             <CameraOff />
           </div>
         ) : (
