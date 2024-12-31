@@ -35,7 +35,9 @@ export default function Level() {
               name: "Environment",
               hideShadow: true,
             }
-          ]} 
+          ]}
+          // TODO: Be sure to remove this line in PROD
+          // disableLoader
         />
 
         <Ground />

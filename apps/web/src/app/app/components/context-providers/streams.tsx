@@ -3,11 +3,8 @@ import useLogs from "@/web/hooks/useLogs";
 import useGlobalStore from "@/web/store/global";
 import { useStreamsStore } from "@/web/store/streams";
 import { WebSocketEvents } from "@melo/common/constants";
-import { useEffect, useRef, useState } from "react";
+import { createContext, type RefObject, useContext, useEffect, useRef, useState } from "react";
 
-interface StreamsProvider {
-  children: React.ReactNode;
-}
 
 const configuration = {
   iceServers: [
@@ -15,9 +12,21 @@ const configuration = {
   ]
 };
 
-export default function Streams({
+// CONTEXT
+interface StreamsContext {
+  peersRef: RefObject<Map<string, RTCPeerConnection>>;
+}
+
+const streamsContext = createContext<StreamsContext | null>(null);
+
+// Provider
+interface StreamsProviderProps {
+  children: React.ReactNode;
+}
+
+export default function StreamsProvider({
   children,
-}: StreamsProvider) {
+}: StreamsProviderProps) {
   const store = useStreamsStore();
   const { socket } = useGlobalStore();
   const { addNewLog } = useLogs();
@@ -43,6 +52,7 @@ export default function Streams({
         peersStream: new Map(state.peersStream.set(userId, event.streams[0]))
       }));
     };
+    
 
     stream?.getTracks().forEach(track => pc.addTrack(track, stream));
     return pc;
@@ -70,6 +80,9 @@ export default function Streams({
         });
         
         useStreamsStore.setState({ localStream: stream, loading: false });
+
+        // If the video is disabled by default
+        if ( !store.isVideoEnabled ) store.setLocalVideo(false, peersRef.current); 
 
         socket.on(WebSocketEvents.EXISTING_USERS, ({ users }: { users: string[] }) => {
           users.forEach(id => initiatePeerConnection(id, stream));
@@ -142,5 +155,13 @@ export default function Streams({
   // if(loading) return <div>Streams Loading...</div>
   if ( loading ) return <Loader title="Streams Loading..." subtitle="The server is managing peer-to-peer connections" progress={20}/>
     
-  return children;
+  return <streamsContext.Provider value={{
+    peersRef,
+  }}>
+    { children }
+  </streamsContext.Provider>
+}
+
+export function useStreams() {
+  return useContext(streamsContext) as StreamsContext;
 }

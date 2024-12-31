@@ -1,3 +1,4 @@
+import { useStreamsStore } from "@/web/store/streams";
 import { CameraOff, MicOff } from "lucide-react";
 import { useEffect, useRef } from "react";
 import { Vector3 } from "three";
@@ -9,6 +10,7 @@ type VideoStreamProps = {
   userPosition: [number, number, number];
   playerPosition: [number, number, number];
   disableDynamicVolume?: boolean;
+  disabled?: boolean;
 };
 
 const VOLUME_MAX_DISTANCE_CAN_HEAR = 3; 
@@ -21,7 +23,7 @@ export default function VideoStream({
   userPosition,
   playerPosition,
   disableDynamicVolume = false,
-  
+  disabled = false,
 }: VideoStreamProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
 
@@ -37,35 +39,37 @@ export default function VideoStream({
 
     const volume = 1 / (1 + Math.exp(-VOLUME_DECAY_RATE * (VOLUME_MAX_DISTANCE_CAN_HEAR - distance)))
 
-    console.log(distance, volume);
-
     videoRef.current.volume = volume;
   }, [playerPosition, userPosition, isLocal]);
 
   // Set video stream
+  const { isVideoEnabled } = useStreamsStore();
+  
   useEffect(() => {
     if (!videoRef.current || !stream) return;
     videoRef.current.srcObject = stream;
-  }, [stream]);
+  }, [stream, isVideoEnabled]);
 
   return (
     <>
       {
-        !stream || stream.getVideoTracks().length == 0 ? (
-          <div className="relative w-full h-full bg-gray-950 rounded-lg flex items-center justify-center">
+        stream?.getVideoTracks()[0].enabled === false ? (
+          <div className="relative w-full h-full rounded-lg flex items-center justify-center text-white">
             <CameraOff />
           </div>
         ) : (
-          <video
-            ref={videoRef}
-            autoPlay
-            playsInline
-            muted={isLocal}
-            className="w-full h-full object-cover rounded-lg"
-            style={{
-              transform: `scaleX(${isLocal ? -1 : 1})`,
-            }}
-          />
+          <div className="relative w-full h-full rounded-lg overflow-hidden text-white">
+            <video
+              ref={videoRef}
+              autoPlay
+              playsInline
+              muted={isLocal}
+              className="w-full h-full object-cover"
+              style={{
+                transform: `scaleX(${isLocal ? -1 : 1})`,
+              }}
+            />
+          </div>
         )
       }
       {!hideName && isLocal && (

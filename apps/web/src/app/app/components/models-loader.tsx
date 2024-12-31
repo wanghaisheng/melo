@@ -17,6 +17,7 @@ export interface ModelsLoadConfiguration {
 
 interface ModelsLoaderProps {
   models: ModelsLoadConfiguration[]; 
+  disableLoader?: boolean;
 }
 
 function Model({
@@ -59,16 +60,17 @@ function ModelLoaderFallback({
 
 export default function ModelsLoader({
   models,
+  disableLoader = false,
 }: ModelsLoaderProps) {
   const [loadCount, setLoadCount] = useState(0);
   const { setModelsLoading } = useGlobalStore();
 
   useEffect(() => {
-    if (loadCount >= models.length) setModelsLoading(false);
+    if (disableLoader || loadCount >= models.length) setModelsLoading(false);
   }, [loadCount]);
 
   return models.map((m, i) => {
-    return <Suspense fallback={<ModelLoaderFallback handleIncreaseLoadCount={() => setLoadCount(c => c + 1)} />}>
+    return <Suspense fallback={disableLoader ? null : <ModelLoaderFallback handleIncreaseLoadCount={() => setLoadCount(c => c + 1)} />}>
       <Model path={m.path} hideShadow={m.hideShadow ?? false} name={m.name} props={m.props}/>
     </Suspense>
   })
