@@ -37,7 +37,7 @@ export default function Level() {
             }
           ]}
           // TODO: Be sure to remove this line in PROD
-          // disableLoader
+          disableLoader
         />
 
         <Ground />
@@ -81,12 +81,6 @@ export default function Level() {
         
         {/* Subtle fill light */}
         <ambientLight intensity={0.4} />
-        
-        {/* <Suspense fallback={null}> */}
-          {/* <Housing />
-          <Environment />
-          <Ground /> */}
-        {/* </Suspense> */}
         
         <gridHelper />
 

@@ -53,11 +53,7 @@ export default function VideoStream({
   return (
     <>
       {
-        stream?.getVideoTracks()[0].enabled === false ? (
-          <div className="relative w-full h-full rounded-lg flex items-center justify-center text-white bg-black">
-            <CameraOff />
-          </div>
-        ) : (
+        stream && stream.getVideoTracks().length >= 1 ? (
           <div className="relative w-full h-full rounded-lg overflow-hidden text-white">
             <video
               ref={videoRef}
@@ -70,6 +66,10 @@ export default function VideoStream({
               }}
             />
           </div>
+        ) : (
+          <div className="relative w-full h-full rounded-lg flex items-center justify-center text-white bg-black">
+            <CameraOff />
+          </div>
         )
       }
       {!hideName && isLocal && (
@@ -79,13 +79,13 @@ export default function VideoStream({
       )}
 
       {/* Check for audio mute */}
-      {
+      {/* {
         (stream === null || stream.getAudioTracks().length == 0) && (
           <div className="absolute bottom-2 right-2 text-red-500">
             <MicOff size={12} />
           </div>
         )
-      }
+      } */}
     </>
   );
 }

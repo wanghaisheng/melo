@@ -1,6 +1,7 @@
 import { useStreams } from "@/web/app/app/components/context-providers/streams";
 import VideoStream from "@/web/app/app/components/video-stream";
 import { Button } from "@/web/components/ui/button";
+import useGlobalStore from "@/web/store/global";
 import { useStreamsStore } from "@/web/store/streams";
 import { Camera, CameraOff, Mic, MicOff } from "lucide-react";
 
@@ -10,14 +11,13 @@ export default function VideoSection() {
     isVideoEnabled, 
     toggleLocalVideo,
   } = useStreamsStore();
+  const { socket } = useGlobalStore();
   
-  // const localHasVideo = localStream?.getVideoTracks().length ?? false;
-  // const localHasAudio = localStream?.getAudioTracks().length ?? false;
-
   const { peersRef } = useStreams();
     
   const handleToggleVideo = async () => {
-    toggleLocalVideo(peersRef.current);
+    if (!socket) return console.error("Socket is missing while toggling camera");
+    toggleLocalVideo(peersRef.current, socket);
   }
   
   return (

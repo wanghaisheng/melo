@@ -48,11 +48,13 @@ export default function StreamsProvider({
     };
 
     pc.ontrack = event => {
+      const stream = event.streams[0];
+
       useStreamsStore.setState(state => ({
-        peersStream: new Map(state.peersStream.set(userId, event.streams[0]))
+        peersStream: new Map(state.peersStream.set(userId, stream))
       }));
     };
-    
+
 
     stream?.getTracks().forEach(track => pc.addTrack(track, stream));
     return pc;
@@ -82,7 +84,7 @@ export default function StreamsProvider({
         useStreamsStore.setState({ localStream: stream, loading: false });
 
         // If the video is disabled by default
-        if ( !store.isVideoEnabled ) store.setLocalVideo(false, peersRef.current); 
+        if ( !store.isVideoEnabled && socket ) store.setLocalVideo(false, peersRef.current, socket); 
 
         socket.on(WebSocketEvents.EXISTING_USERS, ({ users }: { users: string[] }) => {
           users.forEach(id => initiatePeerConnection(id, stream));

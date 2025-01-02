@@ -1,3 +1,5 @@
+import Socket from '@/web/core/socket';
+import { WebSocketEvents } from '@melo/common/constants';
 import { create } from 'zustand';
 
 interface StreamsState {
@@ -10,8 +12,8 @@ interface StreamsState {
   // Local Stream
   localStream: MediaStream | null;
   isVideoEnabled: boolean;
-  toggleLocalVideo: (peersMap: Map<string, RTCPeerConnection>) => Promise<void>;
-  setLocalVideo: (isVideoEnabled: boolean, peersMap: Map<string, RTCPeerConnection>) => Promise<void>;
+  toggleLocalVideo: (peersMap: Map<string, RTCPeerConnection>, socket: Socket) => Promise<void>;
+  setLocalVideo: (isVideoEnabled: boolean, peersMap: Map<string, RTCPeerConnection>, socket: Socket) => Promise<void>;
 }
 
 export const useStreamsStore = create<StreamsState>((set, get) => ({
@@ -26,60 +28,51 @@ export const useStreamsStore = create<StreamsState>((set, get) => ({
     set({ localStream: null, peersStream: new Map() });
   },
 
-  isVideoEnabled: false,
-  setLocalVideo: async (enableVideo, peers) => {
+  isVideoEnabled: true,
+  setLocalVideo: async (enableVideo, peers, socket) => {
     const { localStream } = get();
     
     if ( localStream ) {
       if ( enableVideo ) {
-        localStream.getVideoTracks().map(t => t.enabled = true);
-        // try {
-        //   const newStream = await navigator.mediaDevices.getUserMedia({ video: true });
-        //   const videoTrack = newStream.getVideoTracks()[0];
-          
-        //   // Add the track to local stream
-        //   localStream.addTrack(videoTrack);
-          
-        //   // Create a new MediaStream instance with all current tracks
-        //   const updatedStream = new MediaStream(localStream.getTracks());
-  
-        //   // Update peer connections
-        //   peers.forEach((pc, peerId) => {
-        //     const sender = pc.getSenders().find(s => s.track?.kind === 'video');
-        //     if (sender) {
-        //       sender.replaceTrack(videoTrack);
-        //     } else {
-        //       pc.addTrack(videoTrack, updatedStream);
-        //     }
-        //   });
-  
-        //   // Update the store with the new stream
-        //   set({ 
-        //     localStream: updatedStream,
-        //   });
-        // } catch (error) {
-        //   set({ error: error as Error });
-        // }
+        const newStream = await navigator.mediaDevices.getUserMedia({ video: true });
+        const track = newStream.getVideoTracks()[0];
+
+        if (!localStream) throw new Error("Missing local stream");
+        
+        localStream.addTrack(track);
+
+        peers.forEach(async (pc, peerId) => {
+          pc.addTrack(track, newStream);
+
+          try {
+            // We are renegotiating with the peer connection due to media stream change
+            const offer = await pc.createOffer();
+            await pc.setLocalDescription(new RTCSessionDescription(offer));
+
+            socket!.emit(WebSocketEvents.P2P_OFFER, {
+              offer,
+              to: peerId,
+            });
+
+          } catch (e) {
+            console.log("Error while enabling camera: ", e);
+          }
+        });
+
       } else {
-        
-        // // Turning video off
-        // const videoTracks = localStream.getVideoTracks();
-        
-        // videoTracks.forEach(track => {
-        //   track.stop();
-        //   localStream.removeTrack(track);
-        // });
 
-        // // Update peer connections
-        // peers.forEach((pc, peerId) => {
-        //   const sender = pc.getSenders().find(s => s.track?.kind === 'video');
-        //   if (sender) {
-        //     pc.removeTrack(sender);
-        //   }
-        // });
-
-        localStream.getVideoTracks().forEach(t => t.enabled = false);
+        peers.forEach((pc, peerId) => {
+          const senders = pc.getSenders();
+          const videoSender = senders.find(s => s.track?.kind === "video");
+          if (videoSender) {
+            pc.removeTrack(videoSender);
+          }
+        });
+        
+        localStream?.removeTrack(localStream.getVideoTracks()[0]);
+        
       }
+
       set({
         isVideoEnabled: enableVideo,
       })
@@ -87,14 +80,14 @@ export const useStreamsStore = create<StreamsState>((set, get) => ({
       console.log('No local stream available');
     }
   },
-  toggleLocalVideo: async (peers) => {
+  toggleLocalVideo: async (peers, socket) => {
     const { isVideoEnabled} = get();
     
     if (isVideoEnabled)
       // If enabled, disable it
-      get().setLocalVideo(false, peers);
+      get().setLocalVideo(false, peers, socket);
     else
-      get().setLocalVideo(true, peers);
+      get().setLocalVideo(true, peers, socket);
         
   }
 }));
