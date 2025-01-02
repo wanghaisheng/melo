@@ -80,11 +80,14 @@ export default function StreamsProvider({
           video: true,
           audio: true,
         });
+
+        // We do not want to send video initially
+        stream.removeTrack(stream.getVideoTracks()[0]);
         
         useStreamsStore.setState({ localStream: stream, loading: false });
 
         // If the video is disabled by default
-        if ( !store.isVideoEnabled && socket ) store.setLocalVideo(false, peersRef.current, socket); 
+        // if ( !store.isVideoEnabled && socket ) store.setLocalVideo(false, peersRef.current, socket); 
 
         socket.on(WebSocketEvents.EXISTING_USERS, ({ users }: { users: string[] }) => {
           users.forEach(id => initiatePeerConnection(id, stream));

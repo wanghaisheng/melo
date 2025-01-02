@@ -32,7 +32,7 @@ export default function VideoSection() {
           playerPosition={[0,0,0]} 
           userPosition={[0,0,0]} 
           disableDynamicVolume
-          disabled={!thisPlayer?.video}
+          disabled={!thisPlayer!.video}
         />
       </div>
       {/* Local Stream Controls */}

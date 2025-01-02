@@ -72,7 +72,7 @@ export const useStreamsStore = create<StreamsState>((set, get) => ({
         localStream?.removeTrack(localStream.getVideoTracks()[0]);
         
       }
-
+      
       socket.emit(WebSocketEvents.SET_STREAM_PROPERTIES, {
         video: enableVideo,
       });

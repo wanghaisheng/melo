@@ -48,7 +48,7 @@ export default function VideoStream({
   useEffect(() => {
     if (!videoRef.current || !stream) return;
     videoRef.current.srcObject = stream;
-  }, [stream, isVideoEnabled]);
+  }, [stream, isVideoEnabled, disabled]);
 
   return (
     <>
