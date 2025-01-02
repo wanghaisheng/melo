@@ -28,7 +28,7 @@ export const useStreamsStore = create<StreamsState>((set, get) => ({
     set({ localStream: null, peersStream: new Map() });
   },
 
-  isVideoEnabled: true,
+  isVideoEnabled: false,
   setLocalVideo: async (enableVideo, peers, socket) => {
     const { localStream } = get();
     
@@ -72,6 +72,10 @@ export const useStreamsStore = create<StreamsState>((set, get) => ({
         localStream?.removeTrack(localStream.getVideoTracks()[0]);
         
       }
+
+      socket.emit(WebSocketEvents.SET_STREAM_PROPERTIES, {
+        video: enableVideo,
+      });
 
       set({
         isVideoEnabled: enableVideo,

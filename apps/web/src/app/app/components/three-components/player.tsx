@@ -75,6 +75,7 @@ export default function Player({
             hideName 
             userPosition={userPosition}
             playerPosition={player.position}
+            disabled={!player.video}
           />
         </div>
       </Html>

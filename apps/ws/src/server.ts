@@ -6,7 +6,7 @@ import { WebSocketEvents } from "@melo/common/constants";
 import type { PlayerData } from "@melo/types";
 
 export default class Server extends BasePartyServer implements Party.Server {
-  private userData = new Map<string, PlayerData>();
+  private users = new Map<string, PlayerData>();
   
   constructor(readonly room: Party.Room) {
     super(room);
@@ -45,12 +45,28 @@ export default class Server extends BasePartyServer implements Party.Server {
     this.on(WebSocketEvents.PLAYER_DATA_UPDATE, (data, conn) => {
       // Set the individual player's position and then signal the update to all
       // We are sure that the userData entry is already done
-      this.userData.set(conn.id, data);      
+      this.users.set(conn.id, data);      
 
       this.emitWithout(WebSocketEvents.GLOBAL_PLAYER_DATA_UPDATE, {
-        data: Object.fromEntries(this.userData)
+        data: Object.fromEntries(this.users)
       }, []);
-    })
+    });
+
+    this.on(WebSocketEvents.SET_STREAM_PROPERTIES, (data, conn) => {
+      
+      const previousData = this.users.get(conn.id);
+      if (!previousData) return console.error(`User with id ${conn.id} not found`);
+
+      this.users.set(conn.id, {
+        ...this.users.get(conn.id)!,
+        video: "video" in data ? data.video : previousData.video,
+        audio: "audio" in data ? data.audio : previousData.audio,
+      });      
+
+      this.emitAll(WebSocketEvents.GLOBAL_PLAYER_DATA_UPDATE, {
+        data: Object.fromEntries(this.users)
+      });
+    });
   }
 
   onClose(connection: Party.Connection): void | Promise<void> {
@@ -58,31 +74,33 @@ export default class Server extends BasePartyServer implements Party.Server {
       id: connection.id,
     });
 
-    if(this.userData.has(connection.id)) {
+    if(this.users.has(connection.id)) {
       // If has remove
-      this.userData.delete(connection.id);
+      this.users.delete(connection.id);
     }
 
     this.emitAll(WebSocketEvents.GLOBAL_PLAYER_DATA_UPDATE, {
-      data: Object.fromEntries(this.userData),
+      data: Object.fromEntries(this.users),
     });
   };
 
   onConnect(connection: Party.Connection, ctx: Party.ConnectionContext): void | Promise<void> {
     // Assign position
-    if(!this.userData.has(connection.id)){
+    if(!this.users.has(connection.id)){
       // Add to the hash map the user data
-      this.userData.set(connection.id, {
+      this.users.set(connection.id, {
         connectionId: connection.id,
         username: "User" + Math.floor(Math.random() * 1000),
         displayName: "User" + Math.floor(Math.random() * 1000),
         position: [0,0,0],
         rotation: [0,0,0],
+        video: false,
+        audio: false,
       })
     }
 
     this.emitAll(WebSocketEvents.GLOBAL_PLAYER_DATA_UPDATE, {
-      data: Object.fromEntries(this.userData),
+      data: Object.fromEntries(this.users),
     });
     
     this.emitWithout(WebSocketEvents.USER_JOINED, {

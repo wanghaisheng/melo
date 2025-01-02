@@ -53,7 +53,7 @@ export default function VideoStream({
   return (
     <>
       {
-        stream && stream.getVideoTracks().length >= 1 ? (
+        !disabled ? (
           <div className="relative w-full h-full rounded-lg overflow-hidden text-white">
             <video
               ref={videoRef}
