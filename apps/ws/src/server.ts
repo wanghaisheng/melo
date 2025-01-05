@@ -61,6 +61,7 @@ export default class Server extends BasePartyServer implements Party.Server {
         ...this.users.get(conn.id)!,
         video: "video" in data ? data.video : previousData.video,
         audio: "audio" in data ? data.audio : previousData.audio,
+        streamStatus: "streamStatus" in data ? data.streamStatus : previousData.streamStatus,
       });      
 
       this.emitAll(WebSocketEvents.GLOBAL_PLAYER_DATA_UPDATE, {
@@ -96,6 +97,7 @@ export default class Server extends BasePartyServer implements Party.Server {
         rotation: [0,0,0],
         video: false,
         audio: false,
+        streamStatus: "configure",
       })
     }
 

@@ -75,9 +75,9 @@ export const useStreamsStore = create<StreamsState>((set, get) => ({
         
       }
       
-      socket.emit(WebSocketEvents.SET_STREAM_PROPERTIES, {
-        video: enableVideo,
-      });
+      // socket.emit(WebSocketEvents.SET_STREAM_PROPERTIES, {
+      //   video: enableVideo,
+      // });
 
       set({
         isVideoEnabled: enableVideo,

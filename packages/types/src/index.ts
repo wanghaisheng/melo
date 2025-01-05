@@ -8,4 +8,5 @@ export type PlayerData = {
   // Keep track of whether the video/audio are enabled.
   video: boolean;
   audio: boolean;
+  streamStatus: "configure" | "live";
 }

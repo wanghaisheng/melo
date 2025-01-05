@@ -17,7 +17,7 @@ interface MediaSelectProps {
   currentDeviceId: string | null;
   inputDevices: MediaDeviceInfo[];
   mediaToggleHandler: (value: boolean) => void;
-
+  onDeviceChange: (deviceId: string) => void;
   kind: "video" | "audio";
 }
 
@@ -26,6 +26,7 @@ const MediaSelect = ({
   mediaToggleHandler,
   currentDeviceId,
   inputDevices,
+  onDeviceChange,
   kind,
 }: MediaSelectProps) => {
   return <div className="flex flex-col gap-1 mb-2 mt-2">
@@ -41,14 +42,20 @@ const MediaSelect = ({
         }
       </Button>
 
-      <Select value={currentDeviceId ?? ""} disabled={currentDeviceId === null}>
+      <Select 
+        value={currentDeviceId ?? ""} 
+        disabled={currentDeviceId === null}
+        onValueChange={onDeviceChange}
+      >
         <SelectTrigger className="w-[20rem]">
-          <SelectValue placeholder="Theme" />
+          <SelectValue placeholder="Select device" />
         </SelectTrigger>
         <SelectContent>
           {
             inputDevices.map(device => (
-              <SelectItem key={device.deviceId} value={device.deviceId} className="capitalize">{device.label}</SelectItem>
+              <SelectItem key={device.deviceId} value={device.deviceId} className="capitalize">
+                {device.label}
+              </SelectItem>
             ))
           }
         </SelectContent>
@@ -66,16 +73,39 @@ export default function MediaInitialization({
   const [isAudioEnabled, setAudioEnabled] = useState(true);
   const [stream, setStream] = useState<MediaStream | null>(null);
 
-  const configureStreamMedia = async () => {
-    const s = await navigator.mediaDevices.getUserMedia({ video: true, audio: true, })
-    setStream(s);
+  const configureStreamMedia = async (videoDeviceId?: string, audioDeviceId?: string) => {
+    // Stop all tracks in the existing stream if it exists
+    if (stream) {
+      stream.getTracks().forEach(track => track.stop());
+    }
+
+    try {
+      const constraints: MediaStreamConstraints = {
+        video: videoDeviceId ? {
+          deviceId: { exact: videoDeviceId }
+        } : true,
+        audio: audioDeviceId ? {
+          deviceId: { exact: audioDeviceId }
+        } : true,
+      };
+
+      const newStream = await navigator.mediaDevices.getUserMedia(constraints);
+      setStream(newStream);
+      
+      // Update enabled states based on current settings
+      newStream.getVideoTracks().forEach(track => track.enabled = isVideoEnabled);
+      newStream.getAudioTracks().forEach(track => track.enabled = isAudioEnabled);
+      
+      return newStream;
+    } catch (error) {
+      console.error('Error getting media stream:', error);
+    }
   }
 
   const getAllMediaInputs = async () => {
     const inputs = await navigator.mediaDevices.enumerateDevices();
     const inputGroups = Object.groupBy(inputs, i => i.kind);
     
-    console.log(inputGroups.videoinput!.map(i => i.deviceId));
     setVideoDevices(inputGroups.videoinput ?? []);
     setAudioDevices(inputGroups.audioinput ?? []);
   }
@@ -84,25 +114,41 @@ export default function MediaInitialization({
     configureStreamMedia();
     getAllMediaInputs();
   }, []);
+
+  useEffect(() => {
+    if (stream) {
+      stream.getVideoTracks().forEach(track => track.enabled = isVideoEnabled);
+      stream.getAudioTracks().forEach(track => track.enabled = isAudioEnabled);
+    }
+  }, [isVideoEnabled, isAudioEnabled, stream]);
   
   const getInputDeviceByKind = (kind: "video" | "audio") => {
     let inputDeviceId = null;
 
-    if ( stream && stream.getTracks().find(t => t.kind === kind) !== null) {
-      // Find track that matches the name
+    if (stream && stream.getTracks().find(t => t.kind === kind) !== null) {
       const inputTrack = stream.getTracks().find(t => t.kind === kind);
-      if ( !inputTrack ) return null;
+      if (!inputTrack) return null;
       
       (kind === "audio" ? audioDevices : videoDevices).forEach(d => {
-        if ( d.label === inputTrack.label ) inputDeviceId = d.deviceId;
+        if (d.label === inputTrack.label) inputDeviceId = d.deviceId;
       });
     }
 
     return inputDeviceId;
   }
 
+  const changeDevices = async (deviceId: string, kind: "video" | "audio") => {
+    const currentVideoId = kind === "video" ? deviceId : getInputDeviceByKind("video");
+    const currentAudioId = kind === "audio" ? deviceId : getInputDeviceByKind("audio");
+    
+    const newStream = await configureStreamMedia(currentVideoId ?? undefined, currentAudioId ?? undefined);
+    if (newStream) {
+      // Refresh device list after changing devices
+      getAllMediaInputs();
+    }
+  }
+  
   const currentVideoDeviceId = getInputDeviceByKind("video");
-  console.log(currentVideoDeviceId);
   const currentAudioDeviceId = getInputDeviceByKind("audio");
 
   return <div className="flex-[2] flex flex-col justify-center gap-4">
@@ -126,6 +172,7 @@ export default function MediaInitialization({
       mediaToggleHandler={setVideoEnabled}
       currentDeviceId={currentVideoDeviceId}
       inputDevices={videoDevices}
+      onDeviceChange={(deviceId) => changeDevices(deviceId, "video")}
       kind="video"
     />
 
@@ -134,10 +181,18 @@ export default function MediaInitialization({
       mediaToggleHandler={setAudioEnabled}
       currentDeviceId={currentAudioDeviceId}
       inputDevices={audioDevices}
+      onDeviceChange={(deviceId) => changeDevices(deviceId, "audio")}
       kind="audio"
     />
 
-    <Button className="bg-blue-500 px-6 mr-auto">
+    <Button 
+      className="bg-blue-500 px-6 mr-auto"
+      onClick={() => {
+        if (stream) {
+          onInitialize(stream, isVideoEnabled, isAudioEnabled);
+        }
+      }}
+    >
       Join
       <SquarePlus />
     </Button>

@@ -10,13 +10,17 @@ export default function ConnectSocket({
   children: React.ReactNode;
 }) {
 
-  const { socket } = useGlobalStore();
+  const { socket, socketConnectCallbacks } = useGlobalStore();
   const { players } = usePlayerStore();
 
   useEffect(() => {
     if(!socket) return console.error("Socket is not initialized");
     
     socket.connect();
+
+    socketConnectCallbacks.forEach(cb => {
+      cb(socket);
+    });
   }, [socket]);
 
   // if (!socket || players.length < 1) return <div>Socket Loading....</div>

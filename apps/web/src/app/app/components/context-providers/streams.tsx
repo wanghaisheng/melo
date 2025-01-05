@@ -4,6 +4,7 @@ import useLogs from "@/web/hooks/useLogs";
 import useGlobalStore from "@/web/store/global";
 import { useStreamsStore } from "@/web/store/streams";
 import { WebSocketEvents } from "@melo/common/constants";
+import assert from "node:assert";
 import { createContext, type RefObject, useContext, useEffect, useRef, useState } from "react";
 
 const configuration = {
@@ -28,7 +29,7 @@ export default function StreamsProvider({
   children,
 }: StreamsProviderProps) {
   const store = useStreamsStore();
-  const { socket } = useGlobalStore();
+  const { socket, addSocketConnectCallbacks } = useGlobalStore();
   const { addNewLog } = useLogs();
   
   const peersRef = useRef(new Map<string, RTCPeerConnection>());
@@ -71,17 +72,17 @@ export default function StreamsProvider({
     }
   };
   
-  const init = async () => {
+  const init = async (stream: MediaStream) => {
     if (!socket) return;
     
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: true,
-        audio: false,
-      });
+      // const stream = await navigator.mediaDevices.getUserMedia({
+      //   video: true,
+      //   audio: false,
+      // });
 
       // We do not want to send video initially
-      stream.removeTrack(stream.getVideoTracks()[0]);
+      // stream.removeTrack(stream.getVideoTracks()[0]);
       
       useStreamsStore.setState({ localStream: stream, loading: false });
 
@@ -149,19 +150,28 @@ export default function StreamsProvider({
     }
   };
   
-  useEffect(() => {
-    // init().then(() => setLoading(false))
+  // useEffect(() => {
+  //   // init().then(() => setLoading(false))
 
-    return () => {
-      store.cleanup();
-    };
-  }, [socket]);
+  //   return () => {
+  //     store.cleanup();
+  //   };
+  // }, [socket]);
   
   if ( loading ) return (
     <div className="h-screen w-screen flex">
       <Loader title="Configuration Camera and Mic..." subtitle="The server is managing peer-to-peer connections" className="flex-[3] px-0 mx-0"/>
       <MediaInitialization 
-        onInitialize={() => {}}
+        onInitialize={(stream, isVideoEnabled, isAudioEnabled) => {
+          addSocketConnectCallbacks(async socket => {
+            socket.emit(WebSocketEvents.SET_STREAM_PROPERTIES, {
+              video: isVideoEnabled,
+              audio: isAudioEnabled,
+            });
+          })
+
+          init(stream).then(() => setLoading(false));
+        }}
       />
     </div>
   )
