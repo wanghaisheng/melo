@@ -1,10 +1,10 @@
+import MediaInitialization from "@/web/app/app/components/initialization/media-initialization";
 import Loader from "@/web/app/app/components/loader";
 import useLogs from "@/web/hooks/useLogs";
 import useGlobalStore from "@/web/store/global";
 import { useStreamsStore } from "@/web/store/streams";
 import { WebSocketEvents } from "@melo/common/constants";
 import { createContext, type RefObject, useContext, useEffect, useRef, useState } from "react";
-
 
 const configuration = {
   iceServers: [
@@ -32,6 +32,7 @@ export default function StreamsProvider({
   const { addNewLog } = useLogs();
   
   const peersRef = useRef(new Map<string, RTCPeerConnection>());
+
   const [loading, setLoading] = useState(true);
 
   const createPeerConnection = (userId: string, stream: MediaStream): RTCPeerConnection => {
@@ -70,94 +71,100 @@ export default function StreamsProvider({
     }
   };
   
-  useEffect(() => {
+  const init = async () => {
     if (!socket) return;
+    
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: true,
+        audio: false,
+      });
 
-    const init = async () => {
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({
-          video: true,
-          audio: false,
+      // We do not want to send video initially
+      stream.removeTrack(stream.getVideoTracks()[0]);
+      
+      useStreamsStore.setState({ localStream: stream, loading: false });
+
+      // If the video is disabled by default
+      // if ( !store.isVideoEnabled && socket ) store.setLocalVideo(false, peersRef.current, socket); 
+
+      socket.on(WebSocketEvents.EXISTING_USERS, ({ users }: { users: string[] }) => {
+        users.forEach(id => initiatePeerConnection(id, stream));
+      });
+
+      socket.on(WebSocketEvents.USER_JOINED, ({ id }) => {
+        if (!peersRef.current.has(id)) {
+          createPeerConnection(id, stream);
+        }
+        addNewLog?.({
+          data: `User ${id.slice(0,6)} has joined`,
+          level: "success",
         });
+      });
 
-        // We do not want to send video initially
-        stream.removeTrack(stream.getVideoTracks()[0]);
-        
-        useStreamsStore.setState({ localStream: stream, loading: false });
+      socket.on(WebSocketEvents.P2P_OFFER, async ({ offer, from }) => {
+        let pc = peersRef.current.get(from);
+        if (!pc) {
+          pc = createPeerConnection(from, stream);
+        }
+        await pc.setRemoteDescription(new RTCSessionDescription(offer));
+        const answer = await pc.createAnswer();
+        await pc.setLocalDescription(answer);
+        socket.emit(WebSocketEvents.P2P_ANSWER, { answer, to: from });
+      });
 
-        // If the video is disabled by default
-        // if ( !store.isVideoEnabled && socket ) store.setLocalVideo(false, peersRef.current, socket); 
+      socket.on(WebSocketEvents.P2P_ANSWER, async ({ answer, from }) => {
+        const pc = peersRef.current.get(from);
+        if (pc) {
+          await pc.setRemoteDescription(new RTCSessionDescription(answer));
+        }
+      });
 
-        socket.on(WebSocketEvents.EXISTING_USERS, ({ users }: { users: string[] }) => {
-          users.forEach(id => initiatePeerConnection(id, stream));
-        });
+      socket.on(WebSocketEvents.P2P_ICE_CANDIDATE, async ({ candidate, from }) => {
+        const pc = peersRef.current.get(from);
+        if (pc) {
+          await pc.addIceCandidate(new RTCIceCandidate(candidate));
+        }
+      });
 
-        socket.on(WebSocketEvents.USER_JOINED, ({ id }) => {
-          if (!peersRef.current.has(id)) {
-            createPeerConnection(id, stream);
-          }
-          addNewLog?.({
-            data: `User ${id.slice(0,6)} has joined`,
-            level: "success",
+      socket.on(WebSocketEvents.USER_LEFT, ({ id }) => {
+        if (peersRef.current.has(id)) {
+          peersRef.current.get(id)?.close();
+          peersRef.current.delete(id);
+          useStreamsStore.setState(state => {
+            const newPeers = new Map(state.peersStream);
+            newPeers.delete(id);
+            return { peersStream: newPeers };
           });
+        }
+        addNewLog?.({
+          data: `User ${id.slice(0,6)} has left`,
+          level: "danger",
         });
+      });
 
-        socket.on(WebSocketEvents.P2P_OFFER, async ({ offer, from }) => {
-          let pc = peersRef.current.get(from);
-          if (!pc) {
-            pc = createPeerConnection(from, stream);
-          }
-          await pc.setRemoteDescription(new RTCSessionDescription(offer));
-          const answer = await pc.createAnswer();
-          await pc.setLocalDescription(answer);
-          socket.emit(WebSocketEvents.P2P_ANSWER, { answer, to: from });
-        });
-
-        socket.on(WebSocketEvents.P2P_ANSWER, async ({ answer, from }) => {
-          const pc = peersRef.current.get(from);
-          if (pc) {
-            await pc.setRemoteDescription(new RTCSessionDescription(answer));
-          }
-        });
-
-        socket.on(WebSocketEvents.P2P_ICE_CANDIDATE, async ({ candidate, from }) => {
-          const pc = peersRef.current.get(from);
-          if (pc) {
-            await pc.addIceCandidate(new RTCIceCandidate(candidate));
-          }
-        });
-
-        socket.on(WebSocketEvents.USER_LEFT, ({ id }) => {
-          if (peersRef.current.has(id)) {
-            peersRef.current.get(id)?.close();
-            peersRef.current.delete(id);
-            useStreamsStore.setState(state => {
-              const newPeers = new Map(state.peersStream);
-              newPeers.delete(id);
-              return { peersStream: newPeers };
-            });
-          }
-          addNewLog?.({
-            data: `User ${id.slice(0,6)} has left`,
-            level: "danger",
-          });
-        });
-
-      } catch(e) {
-        console.error("Error initializing:", e);
-        useStreamsStore.setState({ error: e as Error, loading: false });
-      }
-    };
-
-    init().then(() => setLoading(false))
+    } catch(e) {
+      console.error("Error initializing:", e);
+      useStreamsStore.setState({ error: e as Error, loading: false });
+    }
+  };
+  
+  useEffect(() => {
+    // init().then(() => setLoading(false))
 
     return () => {
       store.cleanup();
     };
   }, [socket]);
   
-  // if(loading) return <div>Streams Loading...</div>
-  if ( loading ) return <Loader title="Streams Loading..." subtitle="The server is managing peer-to-peer connections" progress={20}/>
+  if ( loading ) return (
+    <div className="h-screen w-screen flex">
+      <Loader title="Configuration Camera and Mic..." subtitle="The server is managing peer-to-peer connections" className="flex-[3] px-0 mx-0"/>
+      <MediaInitialization 
+        onInitialize={() => {}}
+      />
+    </div>
+  )
     
   return <streamsContext.Provider value={{
     peersRef,

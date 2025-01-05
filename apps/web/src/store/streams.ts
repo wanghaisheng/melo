@@ -11,6 +11,7 @@ interface StreamsState {
   
   // Local Stream
   localStream: MediaStream | null;
+  setLocalStream: (stream: MediaStream | null) => void;
   isVideoEnabled: boolean;
   toggleLocalVideo: (peersMap: Map<string, RTCPeerConnection>, socket: Socket) => Promise<void>;
   setLocalVideo: (isVideoEnabled: boolean, peersMap: Map<string, RTCPeerConnection>, socket: Socket) => Promise<void>;
@@ -18,6 +19,7 @@ interface StreamsState {
 
 export const useStreamsStore = create<StreamsState>((set, get) => ({
   localStream: null,
+  setLocalStream: stream => set({ localStream: stream }),
   peersStream: new Map(),
   loading: true,
   error: null,
