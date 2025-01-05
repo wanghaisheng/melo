@@ -15,7 +15,7 @@ interface StreamsState {
   localStream: MediaStream | null;
   setLocalStream: (stream: MediaStream | null) => void;
   isVideoEnabled: boolean;
-  toggleLocalVideo: (peersMap: Map<string, RTCPeerConnection>, socket: Socket, skipEnabledStateUpdate?: boolean) => Promise<void>;
+  toggleLocalVideo: (peersMap: Map<string, RTCPeerConnection>, socket: Socket) => Promise<void>;
   setLocalVideo: (
     isVideoEnabled: boolean,
     peersMap: Map<string, RTCPeerConnection>, 
@@ -38,7 +38,7 @@ export const useStreamsStore = create<StreamsState>((set, get) => ({
   },
 
   isVideoEnabled: false,
-  setLocalVideo: async (enableVideo, peers, socket, skipEnabledStateUpdate = false) => {
+  setLocalVideo: async (enableVideo, peers, socket) => {
     const { localStream } = get();
     
     if ( localStream ) {
@@ -93,23 +93,21 @@ export const useStreamsStore = create<StreamsState>((set, get) => ({
         video: enableVideo,
       });
 
-      if ( !skipEnabledStateUpdate ) {
-        set({
-          isVideoEnabled: enableVideo,
-        });
-      }
+      set({
+        isVideoEnabled: enableVideo,
+      });
     } else {
       console.log('No local stream available');
     }
   },
-  toggleLocalVideo: async (peers, socket, skipEnabledStateUpdate) => {
+  toggleLocalVideo: async (peers, socket) => {
     const { isVideoEnabled} = get();
     
     if (isVideoEnabled)
       // If enabled, disable it
-      get().setLocalVideo(false, peers, socket, skipEnabledStateUpdate);
+      get().setLocalVideo(false, peers, socket);
     else
-      get().setLocalVideo(true, peers, socket, skipEnabledStateUpdate);
+      get().setLocalVideo(true, peers, socket);
         
   }
 }));
