@@ -201,7 +201,6 @@ export default function MediaInitialization({
       className="bg-lime-500 px-6 mx-auto lg:mx-0"
       onClick={() => {
         if (stream) {
-          console.log(videoDevices);
           onInitialize(stream, isVideoEnabled, isAudioEnabled, currentVideoDeviceId!, currentAudioDeviceId!);
         }
       }}

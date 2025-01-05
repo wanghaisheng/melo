@@ -45,7 +45,6 @@ export const useStreamsStore = create<StreamsState>((set, get) => ({
       if ( enableVideo ) {
         const globalStore = useGlobalStore.getState();
         
-        console.log(globalStore.videoDeviceId);
         const newStream = await navigator.mediaDevices.getUserMedia({
           video: {
             deviceId: globalStore.videoDeviceId!,

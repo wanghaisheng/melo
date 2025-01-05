@@ -155,6 +155,10 @@ export default function StreamsProvider({
             });
           });
 
+          useStreamsStore.setState({
+            isVideoEnabled,
+          });
+
           useGlobalStore.setState({
             videoDeviceId,
             audioDeviceId,

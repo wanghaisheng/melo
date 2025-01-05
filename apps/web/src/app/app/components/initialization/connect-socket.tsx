@@ -28,7 +28,7 @@ export default function ConnectSocket({
 
       /**
        * @description
-       * This here solves the god-awful problem of camera toggling, because I couldn't figure out renegotiation
+       * This here solves the god-awful problem when camera toggling, because I couldn't figure out renegotiation
        * when changing streams as opposed to only tracks.
        */
       setTimeout(() => {
