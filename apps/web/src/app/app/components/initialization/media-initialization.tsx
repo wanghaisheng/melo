@@ -9,6 +9,8 @@ interface MediaInitializationProps {
     stream: MediaStream,
     isVideoEnabled: boolean,
     isAudioEnabled: boolean,
+    videoDeviceId: string,
+    audioDeviceId: string,
   ) => void;
 }
 
@@ -122,7 +124,7 @@ export default function MediaInitialization({
     }
   }, [isVideoEnabled, isAudioEnabled, stream]);
   
-  const getInputDeviceByKind = (kind: "video" | "audio") => {
+  const getInputDeviceByKind = (kind: "video" | "audio"): string | null => {
     let inputDeviceId = null;
 
     if (stream && stream.getTracks().find(t => t.kind === kind) !== null) {
@@ -151,7 +153,7 @@ export default function MediaInitialization({
   const currentVideoDeviceId = getInputDeviceByKind("video");
   const currentAudioDeviceId = getInputDeviceByKind("audio");
 
-  return <div className="flex-[2] flex flex-col justify-center gap-4">
+  return <div className="flex-[2] flex flex-col justify-center items-center lg:items-start gap-4">
     <h1 className="text-4xl font-thin text-gray-600">Setup Devices</h1>
     <div className="h-64 w-96 border-4 border-blue-400 rounded-xl">
       {
@@ -186,10 +188,11 @@ export default function MediaInitialization({
     />
 
     <Button 
-      className="bg-blue-500 px-6 mr-auto"
+      className="bg-blue-500 px-6 mx-auto lg:mr-auto"
       onClick={() => {
         if (stream) {
-          onInitialize(stream, isVideoEnabled, isAudioEnabled);
+          console.log(videoDevices);
+          onInitialize(stream, isVideoEnabled, isAudioEnabled, currentVideoDeviceId!, currentAudioDeviceId!);
         }
       }}
     >

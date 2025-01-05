@@ -2,6 +2,8 @@ import Socket from '@/web/core/socket';
 import { WebSocketEvents } from '@melo/common/constants';
 import { create } from 'zustand';
 
+import useGlobalStore from '@/web/store/global';
+
 interface StreamsState {
   peersStream: Map<string, MediaStream | null>;
   loading: boolean;
@@ -36,7 +38,14 @@ export const useStreamsStore = create<StreamsState>((set, get) => ({
     
     if ( localStream ) {
       if ( enableVideo ) {
-        const newStream = await navigator.mediaDevices.getUserMedia({ video: true });
+        const globalStore = useGlobalStore.getState();
+        
+        console.log(globalStore.videoDeviceId);
+        const newStream = await navigator.mediaDevices.getUserMedia({
+          video: {
+            deviceId: globalStore.videoDeviceId!,
+          }
+        });
         const track = newStream.getVideoTracks()[0];
 
         if (!localStream) throw new Error("Missing local stream");
@@ -75,9 +84,9 @@ export const useStreamsStore = create<StreamsState>((set, get) => ({
         
       }
       
-      // socket.emit(WebSocketEvents.SET_STREAM_PROPERTIES, {
-      //   video: enableVideo,
-      // });
+      socket.emit(WebSocketEvents.SET_STREAM_PROPERTIES, {
+        video: enableVideo,
+      });
 
       set({
         isVideoEnabled: enableVideo,

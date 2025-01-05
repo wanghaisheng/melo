@@ -76,14 +76,6 @@ export default function StreamsProvider({
     if (!socket) return;
     
     try {
-      // const stream = await navigator.mediaDevices.getUserMedia({
-      //   video: true,
-      //   audio: false,
-      // });
-
-      // We do not want to send video initially
-      // stream.removeTrack(stream.getVideoTracks()[0]);
-      
       useStreamsStore.setState({ localStream: stream, loading: false });
 
       // If the video is disabled by default
@@ -150,25 +142,23 @@ export default function StreamsProvider({
     }
   };
   
-  // useEffect(() => {
-  //   // init().then(() => setLoading(false))
-
-  //   return () => {
-  //     store.cleanup();
-  //   };
-  // }, [socket]);
   
   if ( loading ) return (
     <div className="h-screen w-screen flex">
-      <Loader title="Configuration Camera and Mic..." subtitle="The server is managing peer-to-peer connections" className="flex-[3] px-0 mx-0"/>
+      <Loader title="Configuration Camera and Mic..." subtitle="The server is managing peer-to-peer connections" className="flex-[3] px-0 mx-0 hidden lg:flex"/>
       <MediaInitialization 
-        onInitialize={(stream, isVideoEnabled, isAudioEnabled) => {
+        onInitialize={(stream, isVideoEnabled, isAudioEnabled, videoDeviceId, audioDeviceId) => {
           addSocketConnectCallbacks(async socket => {
             socket.emit(WebSocketEvents.SET_STREAM_PROPERTIES, {
               video: isVideoEnabled,
               audio: isAudioEnabled,
             });
-          })
+          });
+
+          useGlobalStore.setState({
+            videoDeviceId,
+            audioDeviceId,
+          });
 
           init(stream).then(() => setLoading(false));
         }}
