@@ -10,7 +10,9 @@ export default function VideoSection() {
   const {
     localStream,
     isVideoEnabled, 
+    isAudioEnabled,
     toggleLocalVideo,
+    toggleLocalAudio,
   } = useStreamsStore();
   const { socket } = useGlobalStore();
   const { peersRef } = useStreams();
@@ -19,6 +21,11 @@ export default function VideoSection() {
   const handleToggleVideo = async () => {
     if (!socket) return console.error("Socket is missing while toggling camera");
     toggleLocalVideo(peersRef.current, socket);
+  }
+
+  const handleToggleAudio = async () => {
+    if (!socket) return console.error("Socket is missing while toggling camera");
+    toggleLocalAudio(peersRef.current, socket);
   }
   
   const thisPlayer = players.find(player => player.connectionId === socket!.id);
@@ -37,9 +44,9 @@ export default function VideoSection() {
       </div>
       {/* Local Stream Controls */}
       <div className="flex gap-2 ">
-        <Button>
+        <Button onClick={handleToggleAudio}>
           {
-            false ? <Mic /> : <MicOff />
+            isAudioEnabled ? <Mic /> : <MicOff />
           }
         </Button>
         <Button onClick={handleToggleVideo}>
