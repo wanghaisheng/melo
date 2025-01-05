@@ -14,7 +14,7 @@ export default function ConnectSocket({
 
   const { socket, socketConnectCallbacks } = useGlobalStore();
   const { players } = usePlayerStore();
-  const { setLocalVideo, isVideoEnabled } = useStreamsStore();
+  const { setLocalTrack, isVideoEnabled } = useStreamsStore();
   const { peersRef } = useStreams();
 
   useEffect(() => {
@@ -34,9 +34,9 @@ export default function ConnectSocket({
       setTimeout(() => {
         if (isVideoEnabled) return;
         
-        setLocalVideo(false, peersRef.current, socket);
+        setLocalTrack("video",false, peersRef.current, socket);
       }, 200);
-      await setLocalVideo(true, peersRef.current, socket);
+      await setLocalTrack("video", true, peersRef.current, socket);
     });
   }, [socket]);
 

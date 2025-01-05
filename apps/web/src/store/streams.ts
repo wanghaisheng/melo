@@ -15,13 +15,20 @@ interface StreamsState {
   localStream: MediaStream | null;
   setLocalStream: (stream: MediaStream | null) => void;
   isVideoEnabled: boolean;
+  isAudioEnabled: boolean;
   toggleLocalVideo: (peersMap: Map<string, RTCPeerConnection>, socket: Socket) => Promise<void>;
-  setLocalVideo: (
-    isVideoEnabled: boolean,
+  toggleLocalAudio: (peersMap: Map<string, RTCPeerConnection>, socket: Socket) => Promise<void>;
+  setLocalTrack: (
+    type: 'audio' | 'video',
+    enabled: boolean,
     peersMap: Map<string, RTCPeerConnection>, 
     socket: Socket,
-    skipEnabledStateUpdate?: boolean, // Used at first to toggle and untoggle streams
+    skipEnabledStateUpdate?: boolean,
   ) => Promise<void>;
+
+  // Store the streaming devices ID to remember when toggling in-call
+  videoDeviceId: string | null;
+  audioDeviceId: string | null;
 }
 
 export const useStreamsStore = create<StreamsState>((set, get) => ({
@@ -38,19 +45,20 @@ export const useStreamsStore = create<StreamsState>((set, get) => ({
   },
 
   isVideoEnabled: false,
-  setLocalVideo: async (enableVideo, peers, socket) => {
+  isAudioEnabled: true, // Usually starts enabled
+  setLocalTrack: async (type, enabled, peers, socket) => {
     const { localStream } = get();
     
-    if ( localStream ) {
-      if ( enableVideo ) {
-        const globalStore = useGlobalStore.getState();
-        
-        const newStream = await navigator.mediaDevices.getUserMedia({
-          video: {
-            deviceId: globalStore.videoDeviceId!,
+    if (localStream) {
+      if (enabled) {
+        const constraints = {
+          [type]: {
+            deviceId: type === "audio" ? get().audioDeviceId! : get().videoDeviceId!,
           }
-        });
-        const track = newStream.getVideoTracks()[0];
+        };
+        
+        const newStream = await navigator.mediaDevices.getUserMedia(constraints);
+        const track = newStream.getTracks()[0];
 
         if (!localStream) throw new Error("Missing local stream");
         
@@ -60,53 +68,56 @@ export const useStreamsStore = create<StreamsState>((set, get) => ({
           pc.addTrack(track, newStream);
 
           try {
-            // We are renegotiating with the peer connection due to media stream change
             const offer = await pc.createOffer();
             await pc.setLocalDescription(new RTCSessionDescription(offer));
 
-            socket!.emit(WebSocketEvents.P2P_OFFER, {
+            socket.emit(WebSocketEvents.P2P_OFFER, {
               offer,
               to: peerId,
             });
 
           } catch (e) {
-            console.log("Error while enabling camera: ", e);
+            console.log(`Error while enabling ${type}: `, e);
           }
         });
 
       } else {
-
-        peers.forEach((pc, peerId) => {
+        peers.forEach((pc) => {
           const senders = pc.getSenders();
-          const videoSender = senders.find(s => s.track?.kind === "video");
-          if (videoSender) {
-            pc.removeTrack(videoSender);
+          const sender = senders.find(s => s.track?.kind === type);
+          if (sender) {
+            pc.removeTrack(sender);
           }
         });
         
-        localStream?.removeTrack(localStream.getVideoTracks()[0]);
-        
+        const track = localStream.getTracks().find(t => t.kind === type);
+        if (track) {
+          localStream.removeTrack(track);
+        }
       }
       
       socket.emit(WebSocketEvents.SET_STREAM_PROPERTIES, {
-        video: enableVideo,
+        [type]: enabled,
       });
 
       set({
-        isVideoEnabled: enableVideo,
+        [`is${type.charAt(0).toUpperCase() + type.slice(1)}Enabled`]: enabled,
       });
     } else {
       console.log('No local stream available');
     }
   },
+  
   toggleLocalVideo: async (peers, socket) => {
-    const { isVideoEnabled} = get();
-    
-    if (isVideoEnabled)
-      // If enabled, disable it
-      get().setLocalVideo(false, peers, socket);
-    else
-      get().setLocalVideo(true, peers, socket);
-        
-  }
+    const { isVideoEnabled } = get();
+    get().setLocalTrack('video', !isVideoEnabled, peers, socket);
+  },
+
+  toggleLocalAudio: async (peers, socket) => {
+    const { isAudioEnabled } = get();
+    get().setLocalTrack('audio', !isAudioEnabled, peers, socket);
+  },
+
+  videoDeviceId: null,
+  audioDeviceId: null,
 }));

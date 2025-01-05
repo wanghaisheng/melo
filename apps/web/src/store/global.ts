@@ -11,10 +11,6 @@ interface GlobalState {
   // List of callbacks to call after the socket was initialized
   socketConnectCallbacks: {(socket: Socket): Promise<void>}[];
   addSocketConnectCallbacks: (cb: {(socket: Socket): Promise<void>}) => void;
-
-  // Store the streaming devices ID to remember when toggling in-call
-  videoDeviceId: string | null;
-  audioDeviceId: string | null;
 }
 
 const useGlobalStore = create<GlobalState>((set) => ({
@@ -28,8 +24,6 @@ const useGlobalStore = create<GlobalState>((set) => ({
   socketConnectCallbacks: [],
   addSocketConnectCallbacks: cb => set(prev => ({ socketConnectCallbacks: [...prev.socketConnectCallbacks, cb ]})),
 
-  videoDeviceId: null,
-  audioDeviceId: null,
 }));
 
 export default useGlobalStore;

@@ -4,7 +4,6 @@ import useLogs from "@/web/hooks/useLogs";
 import useGlobalStore from "@/web/store/global";
 import { useStreamsStore } from "@/web/store/streams";
 import { WebSocketEvents } from "@melo/common/constants";
-import assert from "node:assert";
 import { createContext, type RefObject, useContext, useEffect, useRef, useState } from "react";
 
 const configuration = {
@@ -28,7 +27,6 @@ interface StreamsProviderProps {
 export default function StreamsProvider({
   children,
 }: StreamsProviderProps) {
-  const store = useStreamsStore();
   const { socket, addSocketConnectCallbacks } = useGlobalStore();
   const { addNewLog } = useLogs();
   
@@ -77,9 +75,6 @@ export default function StreamsProvider({
     
     try {
       useStreamsStore.setState({ localStream: stream, loading: false });
-
-      // If the video is disabled by default
-      // if ( !store.isVideoEnabled && socket ) store.setLocalVideo(false, peersRef.current, socket); 
 
       socket.on(WebSocketEvents.EXISTING_USERS, ({ users }: { users: string[] }) => {
         users.forEach(id => initiatePeerConnection(id, stream));
@@ -157,9 +152,7 @@ export default function StreamsProvider({
 
           useStreamsStore.setState({
             isVideoEnabled,
-          });
-
-          useGlobalStore.setState({
+            isAudioEnabled,
             videoDeviceId,
             audioDeviceId,
           });
