@@ -5,6 +5,7 @@ import { useState } from "react";
 
 import { PlayerData } from "@melo/types";
 import VideoStream from "@/web/app/app/components/video-stream";
+import useGlobalStore from "@/web/store/global";
 
 interface PlayerProps {
   stream: MediaStream | null;

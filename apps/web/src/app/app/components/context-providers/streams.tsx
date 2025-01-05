@@ -41,7 +41,7 @@ export default function StreamsProvider({
     pc.onicecandidate = e => {
       if (e.candidate && socket) {
         socket.emit(WebSocketEvents.P2P_ICE_CANDIDATE, {
-          candidate: e.candidate,
+        candidate: e.candidate,
           to: userId,
         });
       }
@@ -54,7 +54,6 @@ export default function StreamsProvider({
         peersStream: new Map(state.peersStream.set(userId, stream))
       }));
     };
-
 
     stream?.getTracks().forEach(track => pc.addTrack(track, stream));
     return pc;
@@ -78,7 +77,7 @@ export default function StreamsProvider({
       try {
         const stream = await navigator.mediaDevices.getUserMedia({
           video: true,
-          audio: true,
+          audio: false,
         });
 
         // We do not want to send video initially

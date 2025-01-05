@@ -42,13 +42,10 @@ export default function VideoStream({
     videoRef.current.volume = volume;
   }, [playerPosition, userPosition, isLocal]);
 
-  // Set video stream
-  const { isVideoEnabled } = useStreamsStore();
-  
   useEffect(() => {
     if (!videoRef.current || !stream) return;
     videoRef.current.srcObject = stream;
-  }, [stream, isVideoEnabled, disabled]);
+  }, [stream, disabled]);
 
   return (
     <>
