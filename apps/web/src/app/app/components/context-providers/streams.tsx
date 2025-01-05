@@ -145,7 +145,7 @@ export default function StreamsProvider({
   
   if ( loading ) return (
     <div className="h-screen w-screen flex">
-      <Loader title="Configuration Camera and Mic..." subtitle="The server is managing peer-to-peer connections" className="flex-[3] px-0 mx-0 hidden lg:flex"/>
+      <Loader title="Media Devices Configurations" subtitle="The server will be managing peer-to-peer connections" className="flex-[3] px-0 mx-0 hidden lg:flex"/>
       <MediaInitialization 
         onInitialize={(stream, isVideoEnabled, isAudioEnabled, videoDeviceId, audioDeviceId) => {
           addSocketConnectCallbacks(async socket => {

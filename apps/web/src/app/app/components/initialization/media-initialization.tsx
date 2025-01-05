@@ -1,7 +1,8 @@
 import VideoStream from "@/web/app/app/components/video-stream";
 import { Button } from "@/web/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/web/components/ui/select";
-import { Mic, MicOff, SquarePlus, Video, VideoOff } from "lucide-react";
+import { cn } from "@/web/lib/utils";
+import { Info, Mic, MicOff, SquarePlus, Video, VideoOff } from "lucide-react";
 import { useEffect, useState } from "react";
 
 interface MediaInitializationProps {
@@ -32,9 +33,8 @@ const MediaSelect = ({
   kind,
 }: MediaSelectProps) => {
   return <div className="flex flex-col gap-1 mb-2 mt-2">
-    <h3 className="text-lg font-bold capitalize">Configure {kind}</h3>
     <div className="flex gap-3 items-center">
-      <Button onClick={() => mediaToggleHandler(!mediaEnabled)} variant="outline">
+      <Button onClick={() => mediaToggleHandler(!mediaEnabled)} variant="outline" className={cn(mediaEnabled ? "bg-rose-400 text-white" : "")}>
         {
           mediaEnabled ? (
             kind === "audio" ? <Mic /> : <Video />
@@ -153,9 +153,10 @@ export default function MediaInitialization({
   const currentVideoDeviceId = getInputDeviceByKind("video");
   const currentAudioDeviceId = getInputDeviceByKind("audio");
 
-  return <div className="flex-[2] flex flex-col justify-center items-center lg:items-start gap-4">
-    <h1 className="text-4xl font-thin text-gray-600">Setup Devices</h1>
-    <div className="h-64 w-96 border-4 border-blue-400 rounded-xl">
+  return <div className="flex-[2] flex flex-col justify-center items-center lg:items-start">
+    <h1 className="text-4xl font-thin text-gray-600 mb-1">Setup Devices</h1>
+    <p className="text-xs text-gray-500 mb-4">Configure your camera and microphone before joining the space</p>
+    <div className="h-64 w-96 border-4 border-lime-400 rounded-xl">
       {
         stream && (
           <VideoStream 
@@ -168,6 +169,12 @@ export default function MediaInitialization({
         )
       }
     </div>
+    <span className="text-xs text-gray-500 inline-flex items-center font-sans gap-1 mt-2">
+      <Info size={12} />
+      Preview your camera to ensure proper lighting and positioning
+    </span>
+    
+    <div className="mt-4"></div>
     
     <MediaSelect
       mediaEnabled={isVideoEnabled}
@@ -187,8 +194,11 @@ export default function MediaInitialization({
       kind="audio"
     />
 
+      <p className="text-xs text-neutral-400 font-sans mt-3 mb-2">
+      All devices configured properly • Ready to join
+    </p>
     <Button 
-      className="bg-blue-500 px-6 mx-auto lg:mr-auto"
+      className="bg-lime-500 px-6 mx-auto lg:mx-0"
       onClick={() => {
         if (stream) {
           console.log(videoDevices);
