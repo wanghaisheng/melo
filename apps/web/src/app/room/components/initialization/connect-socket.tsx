@@ -30,13 +30,15 @@ export default function ConnectSocket({
        * @description
        * This here solves the god-awful problem when camera toggling, because I couldn't figure out renegotiation
        * when changing streams as opposed to only tracks.
+       * @update
+       * Apparently this doesn't do anything
        */
-      setTimeout(() => {
-        if (isVideoEnabled) return;
+      // setTimeout(() => {
+      //   if (isVideoEnabled) return;
         
-        setLocalTrack("video",false, peersRef.current, socket);
-      }, 200);
-      await setLocalTrack("video", true, peersRef.current, socket);
+      //   setLocalTrack("video",false, peersRef.current, socket);
+      // }, 200);
+      // await setLocalTrack("video", true, peersRef.current, socket);
     });
   }, [socket]);
 

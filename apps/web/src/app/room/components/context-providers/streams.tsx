@@ -62,7 +62,10 @@ export default function StreamsProvider({
   const initiatePeerConnection = async (userId: string, stream: MediaStream) => {
     const pc = createPeerConnection(userId, stream);
     try {
-      const offer = await pc.createOffer();
+      const offer = await pc.createOffer({
+        offerToReceiveAudio: true,
+        offerToReceiveVideo: true,
+      });
       await pc.setLocalDescription(offer);
       socket?.emit(WebSocketEvents.P2P_OFFER, { offer, to: userId });
     } catch(e) {

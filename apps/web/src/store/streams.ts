@@ -72,7 +72,7 @@ export const useStreamsStore = create<StreamsState>((set, get) => ({
         } else {
           return console.error("Invalid media type: ", type);
         }
-        
+
         const newStream = await navigator.mediaDevices.getUserMedia(constraints);
         const changedTrack = newStream.getTracks().find(t => t.kind === type);
         
@@ -84,13 +84,15 @@ export const useStreamsStore = create<StreamsState>((set, get) => ({
 
         peers.forEach(async (pc, peerId) => {
           // pc.addTrack(track, newStream);
-          console.log(newStream.getTracks());
           newStream.getTracks().forEach(track => {
             pc.addTrack(track, newStream);
           });
 
           try {
-            const offer = await pc.createOffer();
+            const offer = await pc.createOffer({
+              offerToReceiveAudio: true,
+              offerToReceiveVideo: true,
+            });
             await pc.setLocalDescription(new RTCSessionDescription(offer));
 
             socket.emit(WebSocketEvents.P2P_OFFER, {
@@ -113,8 +115,8 @@ export const useStreamsStore = create<StreamsState>((set, get) => ({
              * @description Somehow disabling the track before removing it solves the microphone
              * voice leak even after mute
              */
-            const t = sender.track;
-            t!.enabled = false;
+            // const t = sender.track;
+            // t!.enabled = false;
 
             pc.removeTrack(sender);
           }
@@ -136,6 +138,8 @@ export const useStreamsStore = create<StreamsState>((set, get) => ({
     } else {
       console.log('No local stream available');
     }
+
+    console.log(localStream?.getTracks());
   },
   
   toggleLocalVideo: async (peers, socket) => {
