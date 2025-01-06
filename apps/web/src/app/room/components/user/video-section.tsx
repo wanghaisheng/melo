@@ -20,12 +20,12 @@ export default function VideoSection() {
     
   const handleToggleVideo = async () => {
     if (!socket) return console.error("Socket is missing while toggling camera");
-    toggleLocalVideo(peersRef.current, socket);
+    toggleLocalVideo(peersRef.current!, socket);
   }
 
   const handleToggleAudio = async () => {
     if (!socket) return console.error("Socket is missing while toggling camera");
-    toggleLocalAudio(peersRef.current, socket);
+    toggleLocalAudio(peersRef.current!, socket);
   }
   
   const thisPlayer = players.find(player => player.connectionId === socket!.id);

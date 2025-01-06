@@ -45,7 +45,8 @@ export default function Level() {
         {/* Disable Map Controls while loading */}
         <MapControls 
           enableRotate={false}
-          minZoom={30}
+          minZoom={50}
+          maxZoom={100}
           zoomSpeed={3}
           enablePan={!modelsLoading}
         />
@@ -53,7 +54,7 @@ export default function Level() {
         <color attach="background" args={['#3B8B5D']} />
         <OrthographicCamera
           makeDefault
-          zoom={80}
+          zoom={100}
           position={[10, 14, 10]}
           near={-1000}
           far={1000}
