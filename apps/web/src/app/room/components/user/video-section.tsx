@@ -1,32 +1,12 @@
-import { useStreams } from "@/web/app/room/components/context-providers/streams";
 import VideoStream from "@/web/app/room/components/video-stream";
-import { Button } from "@/web/components/ui/button";
 import useGlobalStore from "@/web/store/global";
 import usePlayerStore from "@/web/store/players";
 import { useStreamsStore } from "@/web/store/streams";
-import { Camera, CameraOff, Mic, MicOff } from "lucide-react";
 
 export default function VideoSection() {
-  const {
-    localStream,
-    isVideoEnabled, 
-    isAudioEnabled,
-    toggleLocalVideo,
-    toggleLocalAudio,
-  } = useStreamsStore();
+  const { localStream } = useStreamsStore();
   const { socket } = useGlobalStore();
-  const { peersRef } = useStreams();
   const { players } = usePlayerStore();
-    
-  const handleToggleVideo = async () => {
-    if (!socket) return console.error("Socket is missing while toggling camera");
-    toggleLocalVideo(peersRef.current!, socket);
-  }
-
-  const handleToggleAudio = async () => {
-    if (!socket) return console.error("Socket is missing while toggling camera");
-    toggleLocalAudio(peersRef.current!, socket);
-  }
   
   const thisPlayer = players.find(player => player.connectionId === socket!.id);
   return (
@@ -41,19 +21,6 @@ export default function VideoSection() {
           disableDynamicVolume
           disabled={!thisPlayer!.video}
         />
-      </div>
-      {/* Local Stream Controls */}
-      <div className="flex gap-2 ">
-        <Button onClick={handleToggleAudio}>
-          {
-            isAudioEnabled ? <Mic /> : <MicOff />
-          }
-        </Button>
-        <Button onClick={handleToggleVideo}>
-          {
-            isVideoEnabled ? <Camera /> : <CameraOff />
-          }
-        </Button>
       </div>
     </div>
   )
