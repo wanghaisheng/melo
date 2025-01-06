@@ -6,7 +6,7 @@ import ConnectSocket from "@/web/app/room/components/initialization/connect-sock
 import SocketConnection from "@/web/app/room/components/initialization/socket";
 import StreamsProvider from "@/web/app/room/components/context-providers/streams";
 import Level from "@/web/app/room/components/level";
-import VideoSection from "@/web/app/room/components/video-section";
+import VideoSection from "@/web/app/room/components/user/video-section";
 import { useParams } from "next/navigation";
 
 export default function Page() {
