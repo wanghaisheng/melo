@@ -1,6 +1,8 @@
 import { useStreams } from "@/web/app/app/components/context-providers/streams";
 import VideoStream from "@/web/app/app/components/video-stream";
 import { Button } from "@/web/components/ui/button";
+import useGlobalStore from "@/web/store/global";
+import usePlayerStore from "@/web/store/players";
 import { useStreamsStore } from "@/web/store/streams";
 import { Camera, CameraOff, Mic, MicOff } from "lucide-react";
 
@@ -8,18 +10,25 @@ export default function VideoSection() {
   const {
     localStream,
     isVideoEnabled, 
+    isAudioEnabled,
     toggleLocalVideo,
+    toggleLocalAudio,
   } = useStreamsStore();
-  
-  // const localHasVideo = localStream?.getVideoTracks().length ?? false;
-  // const localHasAudio = localStream?.getAudioTracks().length ?? false;
-
+  const { socket } = useGlobalStore();
   const { peersRef } = useStreams();
+  const { players } = usePlayerStore();
     
   const handleToggleVideo = async () => {
-    toggleLocalVideo(peersRef.current);
+    if (!socket) return console.error("Socket is missing while toggling camera");
+    toggleLocalVideo(peersRef.current, socket);
+  }
+
+  const handleToggleAudio = async () => {
+    if (!socket) return console.error("Socket is missing while toggling camera");
+    toggleLocalAudio(peersRef.current, socket);
   }
   
+  const thisPlayer = players.find(player => player.connectionId === socket!.id);
   return (
     <div className="absolute right-2 top-2 flex flex-col items-end gap-2 z-10">
       {/* Local Video Stream */}
@@ -30,14 +39,14 @@ export default function VideoSection() {
           playerPosition={[0,0,0]} 
           userPosition={[0,0,0]} 
           disableDynamicVolume
-          disabled={!isVideoEnabled}
+          disabled={!thisPlayer!.video}
         />
       </div>
       {/* Local Stream Controls */}
       <div className="flex gap-2 ">
-        <Button>
+        <Button onClick={handleToggleAudio}>
           {
-            false ? <Mic /> : <MicOff />
+            isAudioEnabled ? <Mic /> : <MicOff />
           }
         </Button>
         <Button onClick={handleToggleVideo}>

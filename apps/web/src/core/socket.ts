@@ -51,7 +51,7 @@ export default class Socket {
   }
 
   emit(event: string, payload: object) {
-    if (!this.__PartySocket) throw new Error("Emit called before socket was started");
+    if (!this.__PartySocket) throw new Error(`Emit called before socket was started for event: ${event} with payload ${JSON.stringify(payload)}`);
     
     this.__PartySocket.send(JSON.stringify({
       type: event,

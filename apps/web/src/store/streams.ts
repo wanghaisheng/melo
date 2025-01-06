@@ -1,4 +1,8 @@
+import Socket from '@/web/core/socket';
+import { WebSocketEvents } from '@melo/common/constants';
 import { create } from 'zustand';
+
+import useGlobalStore from '@/web/store/global';
 
 interface StreamsState {
   peersStream: Map<string, MediaStream | null>;
@@ -9,13 +13,27 @@ interface StreamsState {
   
   // Local Stream
   localStream: MediaStream | null;
+  setLocalStream: (stream: MediaStream | null) => void;
   isVideoEnabled: boolean;
-  toggleLocalVideo: (peersMap: Map<string, RTCPeerConnection>) => Promise<void>;
-  setLocalVideo: (isVideoEnabled: boolean, peersMap: Map<string, RTCPeerConnection>) => Promise<void>;
+  isAudioEnabled: boolean;
+  toggleLocalVideo: (peersMap: Map<string, RTCPeerConnection>, socket: Socket) => Promise<void>;
+  toggleLocalAudio: (peersMap: Map<string, RTCPeerConnection>, socket: Socket) => Promise<void>;
+  setLocalTrack: (
+    type: 'audio' | 'video',
+    enabled: boolean,
+    peersMap: Map<string, RTCPeerConnection>, 
+    socket: Socket,
+    skipEnabledStateUpdate?: boolean,
+  ) => Promise<void>;
+
+  // Store the streaming devices ID to remember when toggling in-call
+  videoDeviceId: string | null;
+  audioDeviceId: string | null;
 }
 
 export const useStreamsStore = create<StreamsState>((set, get) => ({
   localStream: null,
+  setLocalStream: stream => set({ localStream: stream }),
   peersStream: new Map(),
   loading: true,
   error: null,
@@ -27,74 +45,109 @@ export const useStreamsStore = create<StreamsState>((set, get) => ({
   },
 
   isVideoEnabled: false,
-  setLocalVideo: async (enableVideo, peers) => {
+  isAudioEnabled: true, // Usually starts enabled
+  setLocalTrack: async (type, enabled, peers, socket) => {
     const { localStream } = get();
     
-    if ( localStream ) {
-      if ( enableVideo ) {
-        localStream.getVideoTracks().map(t => t.enabled = true);
-        // try {
-        //   const newStream = await navigator.mediaDevices.getUserMedia({ video: true });
-        //   const videoTrack = newStream.getVideoTracks()[0];
-          
-        //   // Add the track to local stream
-        //   localStream.addTrack(videoTrack);
-          
-        //   // Create a new MediaStream instance with all current tracks
-        //   const updatedStream = new MediaStream(localStream.getTracks());
-  
-        //   // Update peer connections
-        //   peers.forEach((pc, peerId) => {
-        //     const sender = pc.getSenders().find(s => s.track?.kind === 'video');
-        //     if (sender) {
-        //       sender.replaceTrack(videoTrack);
-        //     } else {
-        //       pc.addTrack(videoTrack, updatedStream);
-        //     }
-        //   });
-  
-        //   // Update the store with the new stream
-        //   set({ 
-        //     localStream: updatedStream,
-        //   });
-        // } catch (error) {
-        //   set({ error: error as Error });
-        // }
+    if (localStream) {
+      if (enabled) {
+        const constraints: MediaStreamConstraints = {
+            video: !get().isVideoEnabled ? false : {
+              deviceId: get().videoDeviceId!,
+            },
+            audio: !get().isAudioEnabled ? false : {
+              deviceId: get().audioDeviceId!,
+            }
+        }
+
+        // Addeing the toggle changes
+        if (type === "audio") {
+          constraints.audio = {
+            deviceId: get().audioDeviceId!,
+          }
+        } else if ( type === "video" ) {
+          constraints.video = {
+            deviceId: get().videoDeviceId!,
+          }
+        } else {
+          return console.error("Invalid media type: ", type);
+        }
+        
+        const newStream = await navigator.mediaDevices.getUserMedia(constraints);
+        const changedTrack = newStream.getTracks().find(t => t.kind === type);
+        
+        if ( !changedTrack ) return console.error("ERROR: Couldn't find the track in new stream of type: ", type);
+
+        if (!localStream) throw new Error("Missing local stream");
+        
+        localStream.addTrack(changedTrack);
+
+        peers.forEach(async (pc, peerId) => {
+          // pc.addTrack(track, newStream);
+          console.log(newStream.getTracks());
+          newStream.getTracks().forEach(track => {
+            pc.addTrack(track, newStream);
+          });
+
+          try {
+            const offer = await pc.createOffer();
+            await pc.setLocalDescription(new RTCSessionDescription(offer));
+
+            socket.emit(WebSocketEvents.P2P_OFFER, {
+              offer,
+              to: peerId,
+            });
+
+          } catch (e) {
+            console.log(`Error while enabling ${type}: `, e);
+          }
+        });
+
       } else {
-        
-        // // Turning video off
-        // const videoTracks = localStream.getVideoTracks();
-        
-        // videoTracks.forEach(track => {
-        //   track.stop();
-        //   localStream.removeTrack(track);
-        // });
+        peers.forEach((pc) => {
+          const senders = pc.getSenders();
+          const sender = senders.find(s => s.track?.kind === type);
 
-        // // Update peer connections
-        // peers.forEach((pc, peerId) => {
-        //   const sender = pc.getSenders().find(s => s.track?.kind === 'video');
-        //   if (sender) {
-        //     pc.removeTrack(sender);
-        //   }
-        // });
+          if (sender) {
+            /**
+             * @description Somehow disabling the track before removing it solves the microphone
+             * voice leak even after mute
+             */
+            const t = sender.track;
+            t!.enabled = false;
 
-        localStream.getVideoTracks().forEach(t => t.enabled = false);
+            pc.removeTrack(sender);
+          }
+        });
+        
+        const track = localStream.getTracks().find(t => t.kind === type);
+        if (track) {
+          localStream.removeTrack(track);
+        }
       }
+      
+      socket.emit(WebSocketEvents.SET_STREAM_PROPERTIES, {
+        [type]: enabled,
+      });
+
       set({
-        isVideoEnabled: enableVideo,
-      })
+        [`is${type.charAt(0).toUpperCase() + type.slice(1)}Enabled`]: enabled,
+      });
     } else {
       console.log('No local stream available');
     }
   },
-  toggleLocalVideo: async (peers) => {
-    const { isVideoEnabled} = get();
-    
-    if (isVideoEnabled)
-      // If enabled, disable it
-      get().setLocalVideo(false, peers);
-    else
-      get().setLocalVideo(true, peers);
-        
-  }
+  
+  toggleLocalVideo: async (peers, socket) => {
+    const { isVideoEnabled } = get();
+    get().setLocalTrack('video', !isVideoEnabled, peers, socket);
+  },
+
+  toggleLocalAudio: async (peers, socket) => {
+    const { isAudioEnabled } = get();
+    get().setLocalTrack('audio', !isAudioEnabled, peers, socket);
+  },
+
+  videoDeviceId: null,
+  audioDeviceId: null,
 }));
