@@ -14,7 +14,7 @@ export default function ConnectSocket({
 
   const { socket, socketConnectCallbacks } = useGlobalStore();
   const { players } = usePlayerStore();
-  const { setLocalTrack, isVideoEnabled } = useStreamsStore();
+  const { setLocalTrack, isVideoEnabled, isAudioEnabled } = useStreamsStore();
   const { peersRef } = useStreams();
 
   useEffect(() => {
@@ -31,14 +31,17 @@ export default function ConnectSocket({
        * This here solves the god-awful problem when camera toggling, because I couldn't figure out renegotiation
        * when changing streams as opposed to only tracks.
        * @update
-       * Apparently this doesn't do anything
+       * Doesn't work apparently 🤯
        */
       // setTimeout(() => {
-      //   if (isVideoEnabled) return;
+      //   console.log("DISABLEDING: ", isVideoEnabled, isAudioEnabled);
         
-      //   setLocalTrack("video",false, peersRef.current, socket);
+      //   if (!isVideoEnabled) setLocalTrack("video",false, peersRef.current!, socket);
+      //   if (!isAudioEnabled) setLocalTrack("audio",false, peersRef.current!, socket);
       // }, 200);
-      // await setLocalTrack("video", true, peersRef.current, socket);
+
+      // await setLocalTrack("video", true, peersRef.current!, socket);
+      // await setLocalTrack("audio", true, peersRef.current!, socket);
     });
   }, [socket]);
 

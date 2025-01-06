@@ -19,7 +19,8 @@ export default function VideoSection() {
           playerPosition={[0,0,0]} 
           userPosition={[0,0,0]} 
           disableDynamicVolume
-          disabled={!thisPlayer!.video}
+          hasVideo={thisPlayer!.video}
+          hasAudio={false}
         />
       </div>
     </div>

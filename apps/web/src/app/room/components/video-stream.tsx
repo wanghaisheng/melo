@@ -10,7 +10,8 @@ type VideoStreamProps = {
   userPosition: [number, number, number];
   playerPosition: [number, number, number];
   disableDynamicVolume?: boolean;
-  disabled?: boolean;
+  hasVideo: boolean;
+  hasAudio: boolean;
 };
 
 const VOLUME_MAX_DISTANCE_CAN_HEAR = 3; 
@@ -23,9 +24,11 @@ export default function VideoStream({
   userPosition,
   playerPosition,
   disableDynamicVolume = false,
-  disabled = false,
+  hasVideo,
+  hasAudio,
 }: VideoStreamProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
+  const audioRef = useRef<HTMLAudioElement>(null);
 
   // Update volume based on distance
   useEffect(() => {
@@ -43,20 +46,26 @@ export default function VideoStream({
   }, [playerPosition, userPosition, isLocal]);
 
   useEffect(() => {
-    if (!videoRef.current || !stream) return;
-    videoRef.current.srcObject = stream;
-  }, [stream, disabled]);
+    if (!stream) return;
+    
+    if (hasVideo && videoRef.current)
+      videoRef.current.srcObject = stream;
+    
+    if (hasAudio && audioRef.current)
+      audioRef.current.srcObject = stream;
+
+  }, [stream, hasVideo, hasAudio]);
 
   return (
     <>
       {
-        !disabled ? (
+        hasVideo ? (
           <div className="relative w-full h-full rounded-lg overflow-hidden text-white">
             <video
               ref={videoRef}
               autoPlay
               playsInline
-              muted={isLocal}
+              muted={true}
               className="w-full h-full object-cover"
               style={{
                 transform: `scaleX(${isLocal ? -1 : 1})`,
@@ -74,6 +83,17 @@ export default function VideoStream({
           You
         </div>
       )}
+
+      {
+        hasAudio && (
+          <audio
+            ref={audioRef}
+            autoPlay
+            playsInline
+            muted={isLocal}
+          />
+        )
+      }
 
       {/* Check for audio mute */}
       {/* {

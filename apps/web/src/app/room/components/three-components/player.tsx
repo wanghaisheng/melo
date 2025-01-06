@@ -5,7 +5,6 @@ import { useState } from "react";
 
 import { PlayerData } from "@melo/types";
 import VideoStream from "@/web/app/room/components/video-stream";
-import useGlobalStore from "@/web/store/global";
 
 interface PlayerProps {
   stream: MediaStream | null;
@@ -76,7 +75,8 @@ export default function Player({
             hideName 
             userPosition={userPosition}
             playerPosition={player.position}
-            disabled={!player.video}
+            hasVideo={player.video}
+            hasAudio={player.audio}
           />
         </div>
       </Html>

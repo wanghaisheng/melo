@@ -45,7 +45,7 @@ export const useStreamsStore = create<StreamsState>((set, get) => ({
   },
 
   isVideoEnabled: false,
-  isAudioEnabled: true, // Usually starts enabled
+  isAudioEnabled: false,
   setLocalTrack: async (type, enabled, peers, socket) => {
     const { localStream } = get();
     
@@ -113,10 +113,10 @@ export const useStreamsStore = create<StreamsState>((set, get) => ({
           if (sender) {
             /**
              * @description Somehow disabling the track before removing it solves the microphone
-             * voice leak even after mute
+             * voice leak even after mute. I DON'T KNOW WHY.
              */
-            // const t = sender.track;
-            // t!.enabled = false;
+            const t = sender.track;
+            t!.enabled = false;
 
             pc.removeTrack(sender);
           }

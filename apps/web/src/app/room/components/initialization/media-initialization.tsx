@@ -113,6 +113,8 @@ export default function MediaInitialization({
             playerPosition={[0,0,0]}
             userPosition={[0,0,0]}
             disableDynamicVolume
+            hasVideo={true}
+            hasAudio={false}
           />
         )
       }
