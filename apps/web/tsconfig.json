@@ -20,7 +20,8 @@
     ],
     "paths": {
       "@/web/*": ["./src/*"],
-      "@/web/env": ["./src/env/index"]
+      "@/web/env": ["./src/env/index"],
+      "react": [ "./node_modules/@types/react" ]
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
