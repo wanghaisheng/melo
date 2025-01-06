@@ -51,21 +51,43 @@ export const useStreamsStore = create<StreamsState>((set, get) => ({
     
     if (localStream) {
       if (enabled) {
-        const constraints = {
-          [type]: {
-            deviceId: type === "audio" ? get().audioDeviceId! : get().videoDeviceId!,
+        const constraints: MediaStreamConstraints = {
+            video: !get().isVideoEnabled ? false : {
+              deviceId: get().videoDeviceId!,
+            },
+            audio: !get().isAudioEnabled ? false : {
+              deviceId: get().audioDeviceId!,
+            }
+        }
+
+        // Addeing the toggle changes
+        if (type === "audio") {
+          constraints.audio = {
+            deviceId: get().audioDeviceId!,
           }
-        };
+        } else if ( type === "video" ) {
+          constraints.video = {
+            deviceId: get().videoDeviceId!,
+          }
+        } else {
+          return console.error("Invalid media type: ", type);
+        }
         
         const newStream = await navigator.mediaDevices.getUserMedia(constraints);
-        const track = newStream.getTracks()[0];
+        const changedTrack = newStream.getTracks().find(t => t.kind === type);
+        
+        if ( !changedTrack ) return console.error("ERROR: Couldn't find the track in new stream of type: ", type);
 
         if (!localStream) throw new Error("Missing local stream");
         
-        localStream.addTrack(track);
+        localStream.addTrack(changedTrack);
 
         peers.forEach(async (pc, peerId) => {
-          pc.addTrack(track, newStream);
+          // pc.addTrack(track, newStream);
+          console.log(newStream.getTracks());
+          newStream.getTracks().forEach(track => {
+            pc.addTrack(track, newStream);
+          });
 
           try {
             const offer = await pc.createOffer();
@@ -85,7 +107,15 @@ export const useStreamsStore = create<StreamsState>((set, get) => ({
         peers.forEach((pc) => {
           const senders = pc.getSenders();
           const sender = senders.find(s => s.track?.kind === type);
+
           if (sender) {
+            /**
+             * @description Somehow disabling the track before removing it solves the microphone
+             * voice leak even after mute
+             */
+            const t = sender.track;
+            t!.enabled = false;
+
             pc.removeTrack(sender);
           }
         });
