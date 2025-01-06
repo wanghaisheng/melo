@@ -3,8 +3,13 @@
   "version": "0.1.0",
   "description": "Interactive virtual spaces for remote teams to work, play, and connect.",
   "scripts": {
-    "dev": "pnpm run --parallel --aggregate-output dev"
+    "dev": "turbo dev",
+    "build": "turbo build"
   },
   "author": "saphalpdyl",
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "turbo": "^2.3.3"
+  },
+  "packageManager": "pnpm@9.12.3"
 }

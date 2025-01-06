@@ -10,6 +10,9 @@ yarn.lock
 out/
 .vercel/
 
+# Turbo repo
+.turbo
+
 # Production build output
 build/
 dist/
