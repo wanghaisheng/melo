@@ -5,10 +5,12 @@ import { Button } from "@melo/ui/ui/button"
 import { Input } from "@melo/ui/ui/input"
 import { Label } from "@melo/ui/ui/label"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@melo/ui/ui/card"
-import { Mail, Lock } from 'lucide-react'
+import { Mail, Lock, ArrowUpRightFromSquareIcon } from 'lucide-react'
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { signInSchema, type SignInSchema } from "@/web/lib/zod-schema"
+import Link from "next/link"
+import { REDIRECT_SIGNUP_PAGE_URL } from "@/web/env"
 
 export default function SignInPage() {
   const {
@@ -78,7 +80,7 @@ export default function SignInPage() {
                   <p className="text-xs text-red-500">&#215; {errors.password.message}</p>
                 )}
               </div>
-              <Button type="submit" className="w-full bg-rose-500 hover:bg-blue-600">Sign In</Button>
+              <Button type="submit" className="w-full bg-rose-500 hover:bg-rose-600">Sign In</Button>
             </form>
           </CardContent>
           <CardFooter className="flex flex-col space-y-4">
@@ -125,6 +127,11 @@ export default function SignInPage() {
               Connect, collaborate, and create in immersive virtual environments designed for modern teams and communities.
             </p>
           </div>
+          <Link href={REDIRECT_SIGNUP_PAGE_URL}>
+            <Button variant="ghost" className="bg-blue-500 text-white">
+              Don't have an account? Sign up now! <ArrowUpRightFromSquareIcon />
+            </Button>
+          </Link>
         </div>
       </div>
     </main>

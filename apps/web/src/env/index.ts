@@ -2,6 +2,7 @@ export const PARTYKIT_HOST = "http://localhost:1999"
 
 // Misc
 export const REDIRECT_LOGIN_PAGE_URL = process.env.REDIRECT_LOGIN_PAGE_URL || "/auth/sign-in/"
+export const REDIRECT_SIGNUP_PAGE_URL = process.env.REDIRECT_SIGNUP_PAGE_URL || "/auth/sign-up/"
 
 // Firebase
 export const FIREBASE_API_KEY = process.env.NEXT_PUBLIC_FIREBASE_API_KEY
