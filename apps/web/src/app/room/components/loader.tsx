@@ -1,4 +1,4 @@
-import { cn } from "@/web/lib/utils";
+import { cn } from "@melo/ui/lib/utils";
 import Image from "next/image";
 
 interface LoaderProps {

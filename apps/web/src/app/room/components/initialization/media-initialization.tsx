@@ -1,5 +1,5 @@
 import VideoStream from "@/web/app/room/components/video-stream";
-import { Button } from "@/web/components/ui/button";
+import { Button } from "@melo/ui/ui/button";
 import { Info, SquarePlus } from "lucide-react";
 import { useEffect, useState } from "react";
 import MediaSelect from "./components/media-select";

@@ -1,0 +1,10 @@
+{
+  "extends": "@melo/ts-config/react-library.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./*"],
+      "react": [ "./node_modules/@types/react" ]
+    },
+  }
+}

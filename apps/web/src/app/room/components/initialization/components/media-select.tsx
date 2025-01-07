@@ -1,7 +1,7 @@
-import { Button } from "@/web/components/ui/button";
-import { SelectContent, SelectItem, SelectTrigger, SelectValue, Select } from "@/web/components/ui/select";
-import { cn } from "@/web/lib/utils";
+import { cn } from "@melo/ui/lib/utils";
+import { SelectContent, SelectItem, SelectTrigger, SelectValue, Select } from "@melo/ui/ui/select";
 import { Mic, MicOff, Video, VideoOff } from "lucide-react";
+import { Button } from "@melo/ui/ui/button";
 
 interface MediaSelectProps {
   mediaEnabled: boolean;

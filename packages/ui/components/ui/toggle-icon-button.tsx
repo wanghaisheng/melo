@@ -1,6 +1,6 @@
-import { Button } from "@/web/components/ui/button";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/web/components/ui/tooltip";
-import { cn } from "@/web/lib/utils";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 
 interface ToggleIconButtonProps {
   disabled: boolean;
