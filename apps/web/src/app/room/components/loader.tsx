@@ -16,7 +16,7 @@ export default function Loader({
   className
 }: LoaderProps) {
   return <div className={cn("h-screen w-screen z-60 backdrop-blur-md flex flex-col gap-2 items-center justify-center bg-white/40 text-gray-700", className)}>
-    <Image src="/melo.svg" alt="Melo Logo" width={600} height={600}/>
+    <Image src="/static/melo.svg" alt="Melo Logo" width={600} height={600}/>
     <h1 className="text-2xl font-bold">{title}</h1>
     <h2 className="text-lg">{subtitle}</h2>
     {

@@ -1,3 +1,5 @@
+"use client";
+
 import { fireauth } from "@/web/firebase/init";
 import { useAuthStore } from "@/web/store/auth";
 import { useEffect } from "react";

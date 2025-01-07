@@ -24,14 +24,14 @@ export default function Level() {
         <ModelsLoader 
           models={[
             {
-              path: "/housing.glb",
+              path: "/static/housing.glb",
               name: "Buildings",
               props: {
                 position: [0,0.5,0]
               }
             },
             {
-              path: "/test.glb",
+              path: "/static/test.glb",
               name: "Environment",
               hideShadow: true,
             }
