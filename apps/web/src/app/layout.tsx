@@ -2,8 +2,7 @@ import type { Metadata } from "next";
 import { Poppins } from "next/font/google";
 
 import "./globals.css";
-// import "@melo/ui/globals.css";
-import "@melo/ui/styles/globals.css";
+import "@melo/ui/styles.css";
 
 import { AuthProvider } from "@/web/providers/auth-provider";
 
@@ -30,7 +29,9 @@ export default function RootLayout({
       <body
         className={`${poppins.className} antialiased`}
       >
-        {children}
+        <AuthProvider>
+          {children}
+        </AuthProvider>
       </body>
     </html>
   );

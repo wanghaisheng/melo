@@ -101,7 +101,7 @@ export default function MediaInitialization({
   const currentVideoDeviceId = getInputDeviceByKind("video");
   const currentAudioDeviceId = getInputDeviceByKind("audio");
 
-  return <div className="flex-[2] flex flex-col justify-center items-center lg:items-start">
+  return <div className="flex-[2] flex flex-col justify-center  lg:items-start">
     <h1 className="text-4xl font-thin text-gray-600 mb-1">Setup Devices</h1>
     <p className="text-xs text-gray-500 mb-4">Configure your camera and microphone before joining the space</p>
     <div className="h-64 w-96 border-4 border-lime-400 rounded-xl">
