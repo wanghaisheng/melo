@@ -25,6 +25,6 @@
   "exports": {
     "./ui/*": "./components/ui/*.tsx",
     "./lib/*": "./lib/*.ts",
-    "./globals.css": "./styles/globals.css"
+    "./*": "./*"
   }
 }
