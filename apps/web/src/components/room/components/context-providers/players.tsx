@@ -1,4 +1,4 @@
-import Loader from "@/web/app/room/components/loader";
+import Loader from "@/web/app/room/_components/loader";
 import useGlobalStore from "@/web/store/global";
 import usePlayerStore from "@/web/store/players";
 import { PlayerData } from "@melo/types";

@@ -1,6 +1,6 @@
 import { Suspense, useEffect, useState } from "react";
 import { Html, useGLTF } from "@react-three/drei";
-import Loader from "@/web/app/room/components/loader";
+import Loader from "@/web/app/room/_components/loader";
 import useGlobalStore from "@/web/store/global";
 
 export interface ModelsLoadConfiguration {

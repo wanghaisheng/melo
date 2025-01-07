@@ -4,7 +4,7 @@ import { useThree, useFrame } from "@react-three/fiber";
 import { useState } from "react";
 
 import { PlayerData } from "@melo/types";
-import VideoStream from "@/web/app/room/components/video-stream";
+import VideoStream from "@/web/app/room/_components/video-stream";
 
 interface PlayerProps {
   stream: MediaStream | null;

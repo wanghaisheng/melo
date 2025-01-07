@@ -1,4 +1,4 @@
-import { useStreams } from "@/web/app/room/components/context-providers/streams";
+import { useStreams } from "@/web/app/room/_components/context-providers/streams";
 import useGlobalStore from "@/web/store/global";
 import { useStreamsStore } from "@/web/store/streams"
 import ToggleIconButton from "@melo/ui/toggle-icon-button";

@@ -1,5 +1,5 @@
-import MediaInitialization from "@/web/app/room/components/initialization/media-initialization";
-import Loader from "@/web/app/room/components/loader";
+import MediaInitialization from "@/web/app/room/_components/initialization/media-initialization";
+import Loader from "@/web/app/room/_components/loader";
 import useLogs from "@/web/hooks/useLogs";
 import useGlobalStore from "@/web/store/global";
 import { useStreamsStore } from "@/web/store/streams";
