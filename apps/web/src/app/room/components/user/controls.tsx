@@ -1,7 +1,7 @@
 import { useStreams } from "@/web/app/room/components/context-providers/streams";
-import ToggleIconButton from "@melo/ui/ui/toggle-icon-button";
 import useGlobalStore from "@/web/store/global";
 import { useStreamsStore } from "@/web/store/streams"
+import ToggleIconButton from "@melo/ui/toggle-icon-button";
 
 import { Mic, MicOff, Camera, CameraOff, Phone, GripVertical, Settings } from "lucide-react";
 

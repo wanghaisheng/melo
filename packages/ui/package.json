@@ -28,7 +28,7 @@
     "tailwindcss": "^3.4.1"
   },
   "exports": {
-    "./ui/*": "./components/ui/*.tsx",
+    "./*": "./components/*.tsx",
     "./lib/*": "./lib/*.ts",
     "./styles.css": "./dist/index.css"
   },
