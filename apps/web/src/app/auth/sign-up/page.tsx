@@ -5,11 +5,13 @@ import { Button } from "@melo/ui/ui/button"
 import { Input } from "@melo/ui/ui/input"
 import { Label } from "@melo/ui/ui/label"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@melo/ui/ui/card"
-import { Mail, Lock, User } from 'lucide-react'
+import { Mail, Lock, User, ArrowUpLeftFromSquare } from 'lucide-react'
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { signUpSchema, type SignUpSchema } from "@/web/lib/zod-schema"
 import { BackgroundShapes } from "@melo/ui/background-shapes"
+import { REDIRECT_LOGIN_PAGE_URL } from "@/web/env"
+import Link from "next/link"
 
 export default function SignUpPage() {
   const {
@@ -52,6 +54,11 @@ export default function SignUpPage() {
               Sign up to start creating and collaborating in immersive virtual environments designed for modern teams and communities.
             </p>
           </div>
+          <Link href={REDIRECT_LOGIN_PAGE_URL}>
+            <Button variant="ghost" className="bg-blue-500 text-white">
+              Already have an account? Sign in <ArrowUpLeftFromSquare />
+            </Button>
+          </Link>
         </div>
       </div>
 
