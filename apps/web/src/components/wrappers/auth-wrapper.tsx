@@ -1,12 +1,10 @@
 "use client";
 
-import Image from "next/image";
-import { DASHBOARD_PAGE_URL } from "@/web/env";
+import { DASHBOARD_PAGE_URL, REDIRECT_LOGIN_PAGE_URL } from "@/web/env";
 import { fireauth } from "@/web/firebase/init";
 import { useAuthStore } from "@/web/store/auth";
 import { usePathname, useRouter } from "next/navigation";
-import { useEffect } from "react";
-import { BackgroundShapes } from "@melo/ui/background-shapes";
+import { useEffect, useState } from "react";
 
 export default function AuthWrapper({
   children,
@@ -30,6 +28,7 @@ export default function AuthWrapper({
         resetAuth();
       }
     })
+
   }, []);
 
   /** REDIRECTION LOGIC IF NO USER IS PRESENT */
@@ -44,14 +43,15 @@ export default function AuthWrapper({
 
   /** SHOW AUTHENTICATION LOADING WIDGET IF THE FIREBASE IS STILL GETTING THE USER */
   if ( auth === null ) {
-    return <div className="h-screen w-screen absolute">
-      <BackgroundShapes count={40} />
-      <div className="h-screen w-screen backdrop-blur-sm flex flex-col justify-center items-center absolute">
-        <Image src="static/melo.svg" alt="Melo Logo" height={800} width={800} />
-        <h1 className="text-4xl font-bold">Fetching Authentication ...</h1>
-        <span className="text-lg text-gray-700">Hang tight! The server is fetching user data</span>
-      </div>
-    </div>
+    return null;
+  }
+
+  if ( auth.status === "anon" && !urlpathname.startsWith("/auth") ) {
+    // To preven the bad set-state error
+    setTimeout(() => {
+      router.push(REDIRECT_LOGIN_PAGE_URL);
+    });
+    return; 
   }
   
   return children;

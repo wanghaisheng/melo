@@ -2,7 +2,7 @@ import { create } from "zustand";
 
 import type { User } from "firebase/auth"
 
-interface AuthSession {
+export interface AuthSession {
   user: User | null,
   status: "auth" | "anon",
 }
