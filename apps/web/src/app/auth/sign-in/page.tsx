@@ -13,7 +13,7 @@ import Link from "next/link"
 import { REDIRECT_SIGNUP_PAGE_URL } from "@/web/env"
 
 import { fireauth } from "@/web/firebase/init"
-import { signInWithEmailAndPassword } from "firebase/auth";
+import { GoogleAuthProvider, signInWithEmailAndPassword, signInWithPopup } from "firebase/auth";
 
 import { useToast } from "@melo/ui/hooks/use-toast";
 import type { FirebaseError } from "firebase/app"
@@ -62,9 +62,17 @@ export default function SignInPage() {
     }
   }
 
-  const handleGoogleSignIn = () => {
-    // Here you would typically handle Google sign-in logic
-    console.log('Google sign-in attempted')
+  const handleGoogleSignIn = async () => {
+    const authProvider = new GoogleAuthProvider();
+    authProvider.addScope("profile")
+    authProvider.addScope("email")
+    
+    const user = await signInWithPopup(fireauth, authProvider);
+    toast({
+      title: "Signed in",
+      description: `Signed in as ${user.user.email}`,
+      action: <UserCircle />,
+    });
   }
 
   return (
