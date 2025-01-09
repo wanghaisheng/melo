@@ -12,7 +12,11 @@ interface Shape {
   color: string
 }
 
-export function BackgroundShapes() {
+export function BackgroundShapes({
+  count = 15,
+}: {
+  count?: number,
+}) {
   const [shapes, setShapes] = useState<Shape[]>([])
 
   useEffect(() => {
@@ -21,7 +25,7 @@ export function BackgroundShapes() {
       const colors = ['rose', 'green', 'blue']
       const shapeTypes: ('triangle' | 'square')[] = ['triangle', 'square']
 
-      for (let i = 0; i < 15; i++) {
+      for (let i = 0; i < count; i++) {
         const shape: Shape = {
           type: shapeTypes[Math.floor(Math.random() * shapeTypes.length)],
           top: `${Math.random() * 100}%`,

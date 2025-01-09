@@ -20,7 +20,7 @@ interface AuthStore {
 }
 
 export const useAuthStore = create<AuthStore>((set, get) => ({
-  auth: __authDefaultValue,
+  auth: null,
   setAuth: auth => set({ auth }),
   resetAuth: () => set({ auth: __authDefaultValue })
 }))

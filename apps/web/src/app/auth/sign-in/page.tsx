@@ -5,12 +5,18 @@ import { Button } from "@melo/ui/ui/button"
 import { Input } from "@melo/ui/ui/input"
 import { Label } from "@melo/ui/ui/label"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@melo/ui/ui/card"
-import { Mail, Lock, ArrowUpRightFromSquareIcon } from 'lucide-react'
+import { Mail, Lock, ArrowUpRightFromSquareIcon, UserCircle, Frown } from 'lucide-react'
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { signInSchema, type SignInSchema } from "@/web/lib/zod-schema"
 import Link from "next/link"
 import { REDIRECT_SIGNUP_PAGE_URL } from "@/web/env"
+
+import { fireauth } from "@/web/firebase/init"
+import { signInWithEmailAndPassword } from "firebase/auth";
+
+import { useToast } from "@melo/ui/hooks/use-toast";
+import type { FirebaseError } from "firebase/app"
 
 export default function SignInPage() {
   const {
@@ -19,11 +25,41 @@ export default function SignInPage() {
     formState: { errors },
   } = useForm<SignInSchema>({
     resolver: zodResolver(signInSchema),
-  })
+  });
 
-  const onSubmit = (data: SignInSchema) => {
-    console.log('Sign in attempted with:', data)
-    // Proceed with sign-in logic
+  const { toast } = useToast();
+
+  const onSubmit = async (data: SignInSchema) => {
+    try {
+      await signInWithEmailAndPassword(fireauth, data.email, data.password);
+      toast({
+        title: "Signed in",
+        description: `Signed in as ${data.email}`,
+        action: <UserCircle />,
+      });
+    } catch(e) {
+      let toastDescription = "";
+      switch ((e as FirebaseError).code) {
+        case "auth/invalid-credential":
+          toastDescription = "The entered credentials are invalid";
+          break;
+      
+        case "auth/invalid-email":
+          toastDescription = `The email ${data.email} is invalid.`
+        break;
+          
+        default:
+          toastDescription = "Something went wrong, and it wasn't your fault!"
+          break;
+      }
+      
+      toast({
+        title: "Couldn't sign in",
+        description: toastDescription,
+        action: <Frown />,
+        danger: true,
+      });
+    }
   }
 
   const handleGoogleSignIn = () => {

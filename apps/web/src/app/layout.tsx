@@ -4,7 +4,7 @@ import { Poppins } from "next/font/google";
 import "./globals.css";
 import "@melo/ui/styles.css";
 
-import AuthWrapper from "@/web/wrappers/auth-wrapper";
+import App from "@/web/components/app";
 
 const poppins = Poppins({
   subsets: ["latin"],
@@ -29,9 +29,9 @@ export default function RootLayout({
       <body
         className={`${poppins.className} antialiased`}
       >
-        <AuthWrapper>
-          {children}
-        </AuthWrapper>
+        <App>
+          { children }
+        </App>
       </body>
     </html>
   );
