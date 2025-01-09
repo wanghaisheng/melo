@@ -1,9 +1,11 @@
 import { useStreams } from "@/web/components/room/components/context-providers/streams";
+import { DASHBOARD_PAGE_URL } from "@/web/env";
 import useGlobalStore from "@/web/store/global";
 import { useStreamsStore } from "@/web/store/streams"
 import ToggleIconButton from "@melo/ui/toggle-icon-button";
 
 import { Mic, MicOff, Camera, CameraOff, Phone, GripVertical, Settings } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 /**
  * @description The bar at the bottom-center of the application
@@ -17,6 +19,8 @@ export default function Controls() {
     toggleLocalAudio,
     toggleLocalVideo,
   } = useStreamsStore();
+
+  const router = useRouter();
   
   return <div className="
       absolute bottom-4 z-10 
@@ -60,7 +64,10 @@ export default function Controls() {
         disabled={false}
         on={<Phone className="rotate-[135deg]" />}
         off={<></>}
-        onClick={() => {}}
+        onClick={() => {
+          // Ends call automatically
+          router.push(DASHBOARD_PAGE_URL);
+        }}
       />
     </div>
   </div>
