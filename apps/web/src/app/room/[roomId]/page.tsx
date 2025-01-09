@@ -10,13 +10,21 @@ import StreamsProvider from "@/web/components/room/components/context-providers/
 import Level from "@/web/components/room/components/level";
 import VideoSection from "@/web/components/room/components/user/video-section";
 import Controls from "@/web/components/room/components/user/controls";
+import { useAuthStore } from "@/web/store/auth";
+import UserCard from "@/web/components/dashboard/sidebar/user-card";
 
 export default function Page() {
-
   const params = useParams<{ roomId: string }>();
+  const { auth } = useAuthStore();
+
+  if ( !auth || !auth.user) return;
 
   return (
-    <div className="w-screen h-screen relative bg-white">
+    <div className=" w-screen h-screen relative bg-white">
+      <div className="absolute z-50 p-2">
+          <UserCard auth={auth} />
+      </div>
+      
       <SocketConnection room={params.roomId}>
         <StreamsProvider>
           <PlayersProvider>

@@ -34,7 +34,7 @@ export default function UserCard({
   return (
     <DropdownMenu modal>
       <DropdownMenuTrigger>
-        <div className="flex items-center p-1 border-[1px] border-gray-200 hover:bg-gray-200 rounded-lg gap-2">
+        <div className="flex items-center p-1 border-[1px] bg-white border-gray-200 hover:bg-gray-200 rounded-lg gap-2">
           <div className={`
             relative
             min-w-9 h-9
