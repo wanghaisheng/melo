@@ -5,13 +5,22 @@ import { Button } from "@melo/ui/ui/button"
 import { Input } from "@melo/ui/ui/input"
 import { Label } from "@melo/ui/ui/label"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@melo/ui/ui/card"
-import { Mail, Lock, User, ArrowUpLeftFromSquare } from 'lucide-react'
+import { Mail, Lock, ArrowUpLeftFromSquare, UserCircle, User } from 'lucide-react'
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { signUpSchema, type SignUpSchema } from "@/web/lib/zod-schema"
 import { BackgroundShapes } from "@melo/ui/background-shapes"
 import { REDIRECT_LOGIN_PAGE_URL } from "@/web/env"
 import Link from "next/link"
+
+import {
+  collection,
+  doc,
+  setDoc
+} from "firebase/firestore"; 
+import { createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, type User as FirebaseUser } from "firebase/auth";
+import { fireauth, firestore } from "@/web/firebase/init"
+import { useToast } from "@melo/ui/hooks/use-toast"
 
 export default function SignUpPage() {
   const {
@@ -20,16 +29,37 @@ export default function SignUpPage() {
     formState: { errors },
   } = useForm<SignUpSchema>({
     resolver: zodResolver(signUpSchema),
-  })
+  });
 
-  const onSubmit = (data: SignUpSchema) => {
-    console.log('Sign up attempted with:', data)
-    // Proceed with sign-up logic
+  const { toast } = useToast();
+
+  const onSubmit = async (data: SignUpSchema) => {
+    const user = await createUserWithEmailAndPassword(fireauth, data.email, data.password);
+    createUserData(user.user, data.name);
   }
+  
+  const handleGoogleSignUp = async () => {
+    const authProvider = new GoogleAuthProvider();
+    authProvider.addScope("profile")
+    authProvider.addScope("email")
+    
+    const user = await signInWithPopup(fireauth, authProvider);
+    createUserData(user.user, user.user.displayName ?? "John");
+  }
+  
+  const createUserData = async (user: FirebaseUser, name: string) => {
+    // Create a users collection in firestore collection
+    // collection("users")
+    await setDoc(doc(firestore, "users", crypto.randomUUID()), {
+      role: "admin",
+      username: name,
+    });
 
-  const handleGoogleSignUp = () => {
-    // Here you would typically handle Google sign-up logic
-    console.log('Google sign-up attempted')
+    toast({
+      title: "Signed in",
+      description: `Signed in as ${user.email}`,
+      action: <UserCircle />,
+    });
   }
 
   return (

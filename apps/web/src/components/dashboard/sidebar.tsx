@@ -1,101 +1,103 @@
-// import React from 'react';
-// import { Building2, Users, MessageSquare, Settings, HelpCircle, Plus, Home } from 'lucide-react';
-// import { 
-//   Sidebar,
-//   SidebarContent,
-//   SidebarSection,
-//   SidebarItem,
-//   SidebarSub
-// } from '@melo/ui/ui/sidebar';
+import UserCard from "@/web/components/dashboard/sidebar/user-card";
+import { useAuthStore } from "@/web/store/auth";
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarGroupLabel,
+  SidebarHeader,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  SidebarProvider,
+  SidebarSeparator,
+} from "@melo/ui/ui/sidebar";
+import { HelpCircle, Settings, Users, PlusCircle, ChevronRight } from 'lucide-react';
 
-// // Sample data structure - replace with your actual data
-// const sampleOrgs = [
-//   {
-//     id: '1',
-//     name: 'Acme Corp',
-//     rooms: [
-//       { id: '1', name: 'General', active: true },
-//       { id: '2', name: 'Engineering', active: false },
-//       { id: '3', name: 'Water Cooler', active: false }
-//     ]
-//   },
-//   {
-//     id: '2',
-//     name: 'Startup Inc',
-//     rooms: [
-//       { id: '4', name: 'Team Space', active: false },
-//       { id: '5', name: 'Coffee Chat', active: false }
-//     ]
-//   }
-// ];
+export default function DashboardSidebar() {
+  const { auth } = useAuthStore();
+  
+  return (
+  <Sidebar collapsible="icon">
+    <SidebarHeader>
+      <UserCard auth={auth!} />
+    </SidebarHeader>
+    <SidebarContent>
+      {/* {joinedOrganizations.map((org) => (
+        <SidebarGroup key={org.id}>
+          <SidebarGroupLabel>{org.name}</SidebarGroupLabel>
+          <SidebarGroupAction>
+            <ChevronRight size={14} />
+          </SidebarGroupAction>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {org.rooms.map((room) => (
+                <SidebarMenuItem key={room.id}>
+                  <SidebarMenuButton
+                    asChild
+                  >
+                    <a href={`#${room.id}`}>{room.name}</a>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+      ))} */}
 
-// export default function DashboardSidebar() {
-//   return (
-//     <SidebarContent>
-//       {/* Home Section */}
-//       <SidebarSection>
-//         <SidebarItem icon={<Home />}>
-//           Home
-//         </SidebarItem>
-//       </SidebarSection>
+      {/* <SidebarSeparator /> */}
 
-//       {/* Organizations Section */}
-//       <SidebarSection
-//         title="Organizations"
-//         titleRightElement={
-//           <button className="p-1 hover:bg-secondary rounded-md">
-//             <Plus className="h-4 w-4" />
-//           </button>
-//         }
-//       >
-//         {sampleOrgs.map(org => (
-//           <SidebarSub 
-//             key={org.id} 
-//             icon={<Building2 className="h-4 w-4" />}
-//             title={org.name}
-//           >
-//             {org.rooms.map(room => (
-//               <SidebarItem 
-//                 key={room.id} 
-//                 icon={<Users className="h-4 w-4" />}
-//                 active={room.active}
-//               >
-//                 {room.name}
-//               </SidebarItem>
-//             ))}
-//             <SidebarItem 
-//               icon={<Plus className="h-4 w-4" />}
-//               className="text-muted-foreground"
-//             >
-//               New Room
-//             </SidebarItem>
-//           </SidebarSub>
-//         ))}
-//       </SidebarSection>
+      <SidebarGroup>
+        <SidebarGroupLabel>Actions</SidebarGroupLabel>
+        <SidebarGroupContent>
+          <SidebarMenu>
+            <SidebarMenuItem>
+              <SidebarMenuButton asChild>
+                <a href="#create-room">
+                  <PlusCircle className="mr-2 h-4 w-4" />
+                  Create Room
+                </a>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          </SidebarMenu>
+        </SidebarGroupContent>
+      </SidebarGroup>
 
-//       {/* Communication Section */}
-//       <SidebarSection title="Communication">
-//         <SidebarItem icon={<MessageSquare className="h-4 w-4" />}>
-//           Direct Messages
-//         </SidebarItem>
-//       </SidebarSection>
+      <SidebarSeparator />
 
-//       {/* Help & Support Section */}
-//       <SidebarSection title="Help & Support">
-//         <SidebarItem icon={<HelpCircle className="h-4 w-4" />}>
-//           Help Center
-//         </SidebarItem>
-//         <SidebarItem icon={<MessageSquare className="h-4 w-4" />}>
-//           Contact Support
-//         </SidebarItem>
-//       </SidebarSection>
-
-//       {/* Settings Section */}
-//       <SidebarSection>
-//         <SidebarItem icon={<Settings className="h-4 w-4" />}>
-//           Settings
-//         </SidebarItem>
-//       </SidebarSection>
-//     </SidebarContent>
-//   );
-// }
+      <SidebarGroup>
+        <SidebarGroupLabel>General</SidebarGroupLabel>
+        <SidebarGroupContent>
+          <SidebarMenu>
+            <SidebarMenuItem>
+              <SidebarMenuButton asChild>
+                <a href="#people">
+                  <Users className="mr-2 h-4 w-4" />
+                  People
+                </a>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+            <SidebarMenuItem>
+              <SidebarMenuButton asChild>
+                <a href="#settings">
+                  <Settings className="mr-2 h-4 w-4" />
+                  Settings
+                </a>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+            <SidebarMenuItem>
+              <SidebarMenuButton asChild>
+                <a href="#help">
+                  <HelpCircle className="mr-2 h-4 w-4" />
+                  Help & Support
+                </a>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          </SidebarMenu>
+        </SidebarGroupContent>
+      </SidebarGroup>
+    </SidebarContent>
+  </Sidebar>
+  );
+}
