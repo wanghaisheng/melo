@@ -13,7 +13,8 @@ import {
   SidebarProvider,
   SidebarSeparator,
 } from "@melo/ui/ui/sidebar";
-import { HelpCircle, Settings, Users, PlusCircle, ChevronRight } from 'lucide-react';
+import { HelpCircle, Settings, Users, PlusCircle, ChevronRight, Phone, DoorClosed } from 'lucide-react';
+import Link from "next/link";
 
 export default function DashboardSidebar() {
   const { auth } = useAuthStore();
@@ -49,7 +50,7 @@ export default function DashboardSidebar() {
       {/* <SidebarSeparator /> */}
 
       <SidebarGroup>
-        <SidebarGroupLabel>Actions</SidebarGroupLabel>
+        <SidebarGroupLabel>Room Actions</SidebarGroupLabel>
         <SidebarGroupContent>
           <SidebarMenu>
             <SidebarMenuItem>
@@ -58,6 +59,22 @@ export default function DashboardSidebar() {
                   <PlusCircle className="mr-2 h-4 w-4" />
                   Create Room
                 </a>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+            <SidebarMenuItem>
+              <SidebarMenuButton asChild>
+                <a href="#join-room">
+                  <DoorClosed className="mr-2 h-4 w-4" />
+                  Join Existing Room
+                </a>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+            <SidebarMenuItem>
+              <SidebarMenuButton asChild>
+                <Link href="#call-history">
+                  <Phone className="mr-2 h-4 w-4" />
+                  Call History
+                </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
           </SidebarMenu>
