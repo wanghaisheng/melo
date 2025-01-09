@@ -2,7 +2,7 @@
   <img src="https://github.com/user-attachments/assets/270b6acf-3ab2-4406-ae04-5dfc52a299e0" alt="Melo Logo" />
 </p>
 
-# Melo
+# Melo <img src="https://github.com/user-attachments/assets/f46ba003-97f8-4abe-92e7-bf183da25042" alt="Melo Logo" height="30" />
 
 Interactive virtual spaces for remote teams to work, play, and connect.
 
