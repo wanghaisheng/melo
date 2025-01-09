@@ -1,4 +1,4 @@
-import VideoStream from "@/web/app/room/_components/video-stream";
+import VideoStream from "@/web/components/room/components/video-stream";
 import { Button } from "@melo/ui/ui/button";
 import { Info, SquarePlus } from "lucide-react";
 import { useEffect, useState } from "react";

@@ -2,14 +2,14 @@
 
 import { useParams } from "next/navigation";
 
-import ChatLogs from "@/web/app/room/_components/chat-logs";
-import PlayersProvider from "@/web/app/room/_components/context-providers/players";
-import ConnectSocket from "@/web/app/room/_components/initialization/connect-socket";
-import SocketConnection from "@/web/app/room/_components/initialization/socket";
-import StreamsProvider from "@/web/app/room/_components/context-providers/streams";
-import Level from "@/web/app/room/_components/level";
-import VideoSection from "@/web/app/room/_components/user/video-section";
-import Controls from "@/web/app/room/_components/user/controls";
+import ChatLogs from "@/web/components/room/components/chat-logs";
+import PlayersProvider from "@/web/components/room/components/context-providers/players";
+import ConnectSocket from "@/web/components/room/components/initialization/connect-socket";
+import SocketConnection from "@/web/components/room/components/initialization/socket";
+import StreamsProvider from "@/web/components/room/components/context-providers/streams";
+import Level from "@/web/components/room/components/level";
+import VideoSection from "@/web/components/room/components/user/video-section";
+import Controls from "@/web/components/room/components/user/controls";
 
 export default function Page() {
 

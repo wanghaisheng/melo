@@ -3,7 +3,7 @@ import { useStreamsStore } from "@/web/store/streams";
 
 import Player from "./player";
 import usePlayerStore from "@/web/store/players";
-import { usePlayers } from "@/web/app/room/_components/context-providers/players";
+import { usePlayers } from "@/web/components/room/components/context-providers/players";
 
 export default function Players() {
   const { socket } = useGlobalStore();

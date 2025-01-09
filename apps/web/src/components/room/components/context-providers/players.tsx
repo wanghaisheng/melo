@@ -1,7 +1,7 @@
-import Loader from "@/web/app/room/_components/loader";
+import Loader from "@/web/components/room/components/loader";
 import useGlobalStore from "@/web/store/global";
 import usePlayerStore from "@/web/store/players";
-import { PlayerData } from "@melo/types";
+import type { PlayerData } from "@melo/types";
 import React, { createContext, useContext, useEffect, useState } from "react";
 
 const playersContext = createContext<PlayersContext | null>(null);

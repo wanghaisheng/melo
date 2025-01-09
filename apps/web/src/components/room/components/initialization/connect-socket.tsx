@@ -1,5 +1,5 @@
-import { useStreams } from "@/web/app/room/_components/context-providers/streams";
-import Loader from "@/web/app/room/_components/loader";
+import { useStreams } from "@/web/components/room/components/context-providers/streams";
+import Loader from "@/web/components/room/components/loader";
 import useGlobalStore from "@/web/store/global";
 import usePlayerStore from "@/web/store/players";
 import { useStreamsStore } from "@/web/store/streams";

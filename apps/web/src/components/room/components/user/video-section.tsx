@@ -1,4 +1,4 @@
-import VideoStream from "@/web/app/room/_components/video-stream";
+import VideoStream from "@/web/components/room/components/video-stream";
 import useGlobalStore from "@/web/store/global";
 import usePlayerStore from "@/web/store/players";
 import { useStreamsStore } from "@/web/store/streams";

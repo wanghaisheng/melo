@@ -3,9 +3,9 @@ import { MapControls, OrthographicCamera, Stats } from "@react-three/drei";
 
 import useGlobalStore from "@/web/store/global";
 
-import Players from "@/web/app/room/_components/three-components/players";
-import ModelsLoader from "@/web/app/room/_components/models-loader";
-import Ground from "@/web/app/room/_components/three-components/ground";
+import Players from "@/web/components/room/components/three-components/players";
+import ModelsLoader from "@/web/components/room/components/models-loader";
+import Ground from "@/web/components/room/components/three-components/ground";
 
 export default function Level() {
   const { modelsLoading } = useGlobalStore();

@@ -3,8 +3,8 @@ import { useSpring, animated } from "@react-spring/three";
 import { useThree, useFrame } from "@react-three/fiber";
 import { useState } from "react";
 
-import { PlayerData } from "@melo/types";
-import VideoStream from "@/web/app/room/_components/video-stream";
+import type { PlayerData } from "@melo/types";
+import VideoStream from "@/web/components/room/components/video-stream";
 
 interface PlayerProps {
   stream: MediaStream | null;

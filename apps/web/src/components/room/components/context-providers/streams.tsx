@@ -1,5 +1,5 @@
-import MediaInitialization from "@/web/app/room/_components/initialization/media-initialization";
-import Loader from "@/web/app/room/_components/loader";
+import MediaInitialization from "@/web/components/room/components/initialization/media-initialization";
+import Loader from "@/web/components/room/components/loader";
 import useLogs from "@/web/hooks/useLogs";
 import useGlobalStore from "@/web/store/global";
 import { useStreamsStore } from "@/web/store/streams";
@@ -143,7 +143,7 @@ export default function StreamsProvider({
   
   if ( loading ) return (
     <div className="h-screen w-screen flex">
-      <Loader title="Media Devices Configurations" subtitle="The server will be managing peer-to-peer connections" className="flex-[3] px-0 mx-0 hidden lg:flex"/>
+      <Loader title="Media Devices Configurations" subtitle="The server will be managing peer-to-peer connections" className="flex-[3] px-0 mx-0 hidden md:flex"/>
       <MediaInitialization 
         onInitialize={(stream, isVideoEnabled, isAudioEnabled, videoDeviceId, audioDeviceId) => {
           addSocketConnectCallbacks(async socket => {

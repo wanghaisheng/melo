@@ -1,7 +1,7 @@
 import { useState } from "react";
-import { ThreeEvent } from "@react-three/fiber";
+import { type ThreeEvent } from "@react-three/fiber";
 
-import { usePlayers } from "@/web/app/room/_components/context-providers/players";
+import { usePlayers } from "@/web/components/room/components/context-providers/players";
 import checkMobilePlatform from "@/web/core/mobile";
 
 import Pointer from "./pointer";
