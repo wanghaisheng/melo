@@ -1,6 +1,6 @@
 import type { FirestoreRoom } from "@melo/types";
 import { addDoc, collection, doc, Firestore, getDoc } from "firebase/firestore";
-import { hash } from "bcrypt";
+import { hash } from "bcryptjs";
 
 namespace MeloRoomHelpers {
   /**

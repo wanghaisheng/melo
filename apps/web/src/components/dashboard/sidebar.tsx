@@ -1,4 +1,5 @@
 import UserCard from "@/web/components/dashboard/sidebar/user-card";
+import { DASHBOARD_PAGE_URL } from "@/web/env";
 import { useAuthStore } from "@/web/store/auth";
 import {
   Sidebar,
@@ -55,10 +56,10 @@ export default function DashboardSidebar() {
           <SidebarMenu>
             <SidebarMenuItem>
               <SidebarMenuButton asChild>
-                <a href="#create-room">
+                <Link href={`${DASHBOARD_PAGE_URL}/create-room/`}>
                   <PlusCircle className="mr-2 h-4 w-4" />
                   Create Room
-                </a>
+                </Link>
               </SidebarMenuButton>
             </SidebarMenuItem>
             <SidebarMenuItem>
