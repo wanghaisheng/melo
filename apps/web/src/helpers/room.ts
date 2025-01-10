@@ -1,8 +1,25 @@
 import type { FirestoreRoom } from "@melo/types";
-import { addDoc, collection, doc, Firestore, getDoc } from "firebase/firestore";
+import { addDoc, collection, doc, DocumentSnapshot, Firestore, getDoc, type DocumentData } from "firebase/firestore";
 import { hash } from "bcryptjs";
 
 namespace MeloRoomHelpers {
+  export function extractRoomDataFromDocSnapshot(room: DocumentSnapshot<DocumentData, DocumentData>): FirestoreRoom | null {
+    const roomData = room.data();
+
+    if (!roomData) return null;
+    
+    return {
+      id: room.id,
+      roomNumber: roomData.roomNumber,
+      createdBy: roomData.createdBy,
+      createdOn: new Date(roomData.createdOn),
+      hasPassword: roomData.hasPassword,
+      password: roomData.password,
+      members: roomData.members,
+      name: roomData.name,
+    }
+  }
+  
   /**
    * Creates a new room with the specified parameters.
    *
@@ -38,20 +55,7 @@ namespace MeloRoomHelpers {
     });
 
     const room = await getDoc(roomRef);
-    const roomData = room.data();
-
-    if (!roomData) return null;
-    
-    return {
-      id: room.id,
-      roomNumber: roomData.roomNumber,
-      createdBy: roomData.createdBy,
-      createdOn: new Date(roomData.createdOn),
-      hasPassword: roomData.hasPassword,
-      password: roomData.password,
-      members: roomData.members,
-      name: roomData.name,
-    }
+    return extractRoomDataFromDocSnapshot(room);
   }
 
   export async function tryGetRoom(
@@ -62,21 +66,7 @@ namespace MeloRoomHelpers {
       const roomRef = doc(firestore, "rooms", roomId);
       const room = await getDoc(roomRef);
 
-      const roomData = room.data();
-
-      if (!roomData) return null;
-      
-      return {
-        id: room.id,
-        roomNumber: roomData.roomNumber,
-        createdBy: roomData.createdBy,
-        createdOn: new Date(roomData.createdOn),
-        hasPassword: roomData.hasPassword,
-        password: roomData.password,
-        members: roomData.members,
-        name: roomData.name,
-      }
-
+      return extractRoomDataFromDocSnapshot(room);
     } catch(_) {
       return null;
     }

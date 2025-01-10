@@ -14,7 +14,7 @@ import {
   SidebarProvider,
   SidebarSeparator,
 } from "@melo/ui/ui/sidebar";
-import { HelpCircle, Settings, Users, PlusCircle, ChevronRight, Phone, DoorClosed } from 'lucide-react';
+import { HelpCircle, Settings, Users, PlusCircle, ChevronRight, Phone, DoorClosed, Home } from 'lucide-react';
 import Link from "next/link";
 
 export default function DashboardSidebar() {
@@ -50,6 +50,20 @@ export default function DashboardSidebar() {
 
       {/* <SidebarSeparator /> */}
 
+      <SidebarGroup>
+        <SidebarGroupContent>
+          <SidebarMenu>
+            <SidebarMenuItem>
+              <SidebarMenuButton asChild>
+                <Link href={DASHBOARD_PAGE_URL}>
+                  <Home className="mr-2 h-4 w-4"/>
+                  Dashboard
+                </Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          </SidebarMenu>
+        </SidebarGroupContent>
+      </SidebarGroup>
       <SidebarGroup>
         <SidebarGroupLabel>Room Actions</SidebarGroupLabel>
         <SidebarGroupContent>

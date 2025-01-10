@@ -19,17 +19,26 @@ export const signUpSchema = z.object({
 
 export type SignUpSchema = z.infer<typeof signUpSchema>
 
-// Define the form validation schema
 export const createRoomSchema = z.object({
   name: z
     .string()
     .min(3, "Room name must be at least 3 characters")
     .max(50, "Room name must be less than 50 characters"),
   hasPassword: z.boolean().default(false),
-  password: z.string().optional().refine((val) => {
-    if (val === undefined) return true;
-    return val.length >= 6;
-  }, "Password must be at least 6 characters"),
-});
+  password: z.string().optional()
+}).refine(
+  (data) => {
+    // Only validate password if hasPassword is true
+    if (data.hasPassword) {
+      return data.password && data.password.length >= 6;
+    }
+    // If hasPassword is false, password validation is skipped
+    return true;
+  },
+  {
+    message: "Password must be at least 6 characters",
+    path: ["password"], // This will show the error on the password field
+  }
+);
 
 export type CreateRoomSchema = z.infer<typeof createRoomSchema>;
