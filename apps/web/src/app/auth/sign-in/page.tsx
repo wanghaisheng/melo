@@ -12,11 +12,12 @@ import { signInSchema, type SignInSchema } from "@/web/lib/zod-schema"
 import Link from "next/link"
 import { REDIRECT_SIGNUP_PAGE_URL } from "@/web/env"
 
-import { fireauth } from "@/web/firebase/init"
+import { fireauth, firestore } from "@/web/firebase/init"
 import { GoogleAuthProvider, signInWithEmailAndPassword, signInWithPopup } from "firebase/auth";
 
 import { useToast } from "@melo/ui/hooks/use-toast";
 import type { FirebaseError } from "firebase/app"
+import AuthHelpers from "@/web/helpers/auth/third-party-sign-up"
 
 export default function SignInPage() {
   const {
@@ -63,16 +64,23 @@ export default function SignInPage() {
   }
 
   const handleGoogleSignIn = async () => {
-    const authProvider = new GoogleAuthProvider();
-    authProvider.addScope("profile")
-    authProvider.addScope("email")
-    
-    const user = await signInWithPopup(fireauth, authProvider);
-    toast({
-      title: "Signed in",
-      description: `Signed in as ${user.user.email}`,
-      action: <UserCircle />,
-    });
+      const [user, error] = await AuthHelpers.signUpUserWithGoogle(fireauth, firestore);
+      if ( error ) {
+        toast({
+          title: "Couldn't Sign up",
+          description: "Something went wrong during the auth process",
+          danger: true,
+          action: <Frown />
+        });
+      }
+  
+      if (!user) return;
+  
+      toast({
+        title: "Signed in",
+        description: `Signed in as ${user.email}`,
+        action: <UserCircle />,
+      });
   }
 
   return (

@@ -5,7 +5,7 @@ import { Button } from "@melo/ui/ui/button"
 import { Input } from "@melo/ui/ui/input"
 import { Label } from "@melo/ui/ui/label"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@melo/ui/ui/card"
-import { Mail, Lock, ArrowUpLeftFromSquare, UserCircle, User } from 'lucide-react'
+import { Mail, Lock, ArrowUpLeftFromSquare, UserCircle, User, Frown } from 'lucide-react'
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { signUpSchema, type SignUpSchema } from "@/web/lib/zod-schema"
@@ -13,14 +13,10 @@ import { BackgroundShapes } from "@melo/ui/background-shapes"
 import { REDIRECT_LOGIN_PAGE_URL } from "@/web/env"
 import Link from "next/link"
 
-import {
-  collection,
-  doc,
-  setDoc
-} from "firebase/firestore"; 
-import { createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, type User as FirebaseUser } from "firebase/auth";
+import { createUserWithEmailAndPassword } from "firebase/auth";
 import { fireauth, firestore } from "@/web/firebase/init"
 import { useToast } from "@melo/ui/hooks/use-toast"
+import AuthHelpers from "@/web/helpers/auth/third-party-sign-up"
 
 export default function SignUpPage() {
   const {
@@ -35,25 +31,21 @@ export default function SignUpPage() {
 
   const onSubmit = async (data: SignUpSchema) => {
     const user = await createUserWithEmailAndPassword(fireauth, data.email, data.password);
-    createUserData(user.user, data.name);
+    AuthHelpers.createUserDataInFirestore(firestore, user.user, data.name);
   }
   
   const handleGoogleSignUp = async () => {
-    const authProvider = new GoogleAuthProvider();
-    authProvider.addScope("profile")
-    authProvider.addScope("email")
-    
-    const user = await signInWithPopup(fireauth, authProvider);
-    createUserData(user.user, user.user.displayName ?? "John");
-  }
-  
-  const createUserData = async (user: FirebaseUser, name: string) => {
-    // Create a users collection in firestore collection
-    // collection("users")
-    await setDoc(doc(firestore, "users", crypto.randomUUID()), {
-      role: "admin",
-      username: name,
-    });
+    const [user, error] = await AuthHelpers.signUpUserWithGoogle(fireauth, firestore);
+    if ( error ) {
+      toast({
+        title: "Couldn't Sign up",
+        description: "Something went wrong during the auth process",
+        danger: true,
+        action: <Frown />
+      });
+    }
+
+    if (!user) return;
 
     toast({
       title: "Signed in",
