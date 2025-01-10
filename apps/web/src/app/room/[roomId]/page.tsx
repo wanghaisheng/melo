@@ -1,42 +1,22 @@
-"use client";
+import Room from "@/web/components/room/room";
+import { firestore } from "@/web/firebase/init";
+import MeloRoomHelpers from "@/web/helpers/room";
+import { notFound } from "next/navigation";
 
-import { useParams } from "next/navigation";
+export default async function Page({
+  params,
+}: {
+  params: Promise<{
+    roomId: string,
+  }>
+}) {
+  const { roomId } = await params;
 
-import ChatLogs from "@/web/components/room/components/chat-logs";
-import PlayersProvider from "@/web/components/room/components/context-providers/players";
-import ConnectSocket from "@/web/components/room/components/initialization/connect-socket";
-import SocketConnection from "@/web/components/room/components/initialization/socket";
-import StreamsProvider from "@/web/components/room/components/context-providers/streams";
-import Level from "@/web/components/room/components/level";
-import VideoSection from "@/web/components/room/components/user/video-section";
-import Controls from "@/web/components/room/components/user/controls";
-import { useAuthStore } from "@/web/store/auth";
-import UserCard from "@/web/components/dashboard/sidebar/user-card";
-
-export default function Page() {
-  const params = useParams<{ roomId: string }>();
-  const { auth } = useAuthStore();
-
-  if ( !auth || !auth.user) return;
-
-  return (
-    <div className=" w-screen h-screen relative bg-white">
-      <div className="absolute z-50 p-2">
-          <UserCard auth={auth} />
-      </div>
-      
-      <SocketConnection room={params.roomId}>
-        <StreamsProvider>
-          <PlayersProvider>
-            <ConnectSocket>
-              <Controls />
-              <VideoSection />
-              <ChatLogs />
-              <Level />
-            </ConnectSocket>
-          </PlayersProvider>
-        </StreamsProvider>
-      </SocketConnection>
-    </div>
-  );
+  // Check if the rooms exist
+  const room = await MeloRoomHelpers.tryGetRoom(firestore, roomId);
+  if ( !room ) {
+    return notFound();
+  }
+  
+  return <Room roomId={roomId}/>
 }
