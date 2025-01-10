@@ -1,15 +1,18 @@
 import { create } from "zustand";
 
 import type { User } from "firebase/auth"
+import type { FirestoreAuthUserData } from "@melo/types";
 
 export interface AuthSession {
   user: User | null,
   status: "auth" | "anon",
+  data: FirestoreAuthUserData | null,
 }
 
 const __authDefaultValue : AuthSession = {
   user: null,
   status: "anon",
+  data: null,
 }
 
 

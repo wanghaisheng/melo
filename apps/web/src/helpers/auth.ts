@@ -17,7 +17,7 @@ namespace AuthHelpers {
    * @param uid The UID of the user the function is trying to check for
    * @returns Boolean where true means the user already exists
    */
-  async function tryGetExistingUserFromFirestore(firestore: Firestore, uid: string): Promise<FirestoreAuthUserData | null> {
+  export async function tryGetExistingUserFromFirestore(firestore: Firestore, uid: string): Promise<FirestoreAuthUserData | null> {
     const userCollectionsRef = collection(firestore, "users");
     const q = query(userCollectionsRef, where("__auth_uid", "==", uid));
     const snapshot = await getDocs(q);

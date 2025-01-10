@@ -16,3 +16,14 @@ export type FirestoreAuthUserData = {
   role: "admin" | "user";
   username: string;
 }
+
+export type FirestoreRoom = {
+  id: string;
+  name: string;
+  roomNumber: string;
+  hasPassword : boolean;
+  password: string;
+  createdBy: FirestoreAuthUserData;
+  createdOn: Date;
+  members: string[];
+}
