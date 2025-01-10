@@ -16,7 +16,7 @@ import Link from "next/link"
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { fireauth, firestore } from "@/web/firebase/init"
 import { useToast } from "@melo/ui/hooks/use-toast"
-import AuthHelpers from "@/web/helpers/auth/third-party-sign-up"
+import AuthHelpers from "@/web/helpers/auth"
 
 export default function SignUpPage() {
   const {

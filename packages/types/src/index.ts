@@ -10,3 +10,9 @@ export type PlayerData = {
   audio: boolean;
   streamStatus: "configure" | "live";
 }
+
+export type FirestoreAuthUserData = {
+  __auth_uid: string;
+  role: "admin" | "user";
+  username: string;
+}

@@ -17,7 +17,7 @@ import { GoogleAuthProvider, signInWithEmailAndPassword, signInWithPopup } from 
 
 import { useToast } from "@melo/ui/hooks/use-toast";
 import type { FirebaseError } from "firebase/app"
-import AuthHelpers from "@/web/helpers/auth/third-party-sign-up"
+import AuthHelpers from "@/web/helpers/auth"
 
 export default function SignInPage() {
   const {

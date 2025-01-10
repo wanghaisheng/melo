@@ -1,3 +1,4 @@
+import type { FirestoreAuthUserData } from "@melo/types";
 import { GoogleAuthProvider, signInWithPopup, type Auth, type User } from "firebase/auth";
 import { 
   collection,
@@ -16,12 +17,12 @@ namespace AuthHelpers {
    * @param uid The UID of the user the function is trying to check for
    * @returns Boolean where true means the user already exists
    */
-  async function checkForExistingUserInFirestore(firestore: Firestore, uid: string): Promise<boolean> {
+  async function tryGetExistingUserFromFirestore(firestore: Firestore, uid: string): Promise<FirestoreAuthUserData | null> {
     const userCollectionsRef = collection(firestore, "users");
     const q = query(userCollectionsRef, where("__auth_uid", "==", uid));
     const snapshot = await getDocs(q);
     
-    return snapshot.docs.length > 0;
+    return snapshot.docs.length > 0 ? snapshot.docs[0].data() as FirestoreAuthUserData : null;
   }
   
 
@@ -39,8 +40,8 @@ namespace AuthHelpers {
    */
   export async function createUserDataInFirestore(firestore: Firestore, user: User, name: string): Promise<void> {
     // Check for existing users before signing in
-    const isUserExists = await checkForExistingUserInFirestore(firestore, user.uid);
-    if ( isUserExists ) return;
+    const firestoreUserData = await tryGetExistingUserFromFirestore(firestore, user.uid);
+    if ( firestoreUserData ) return;
     
     // Create a users collection in firestore collection
     // collection("users")
