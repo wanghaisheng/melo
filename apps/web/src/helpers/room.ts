@@ -57,7 +57,7 @@ namespace MeloRoomHelpers {
     const room = await getDoc(roomRef);
     return extractRoomDataFromDocSnapshot(room);
   }
-
+ 
   export async function tryGetRoom(
     firestore: Firestore, 
     roomId: string

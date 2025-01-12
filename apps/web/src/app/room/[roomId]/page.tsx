@@ -1,3 +1,4 @@
+import PasswordProtectionWrapper from "@/web/components/room/components/initialization/password-protection-wrapper";
 import Room from "@/web/components/room/room";
 import { firestore } from "@/web/firebase/init";
 import MeloRoomHelpers from "@/web/helpers/room";
@@ -18,5 +19,7 @@ export default async function Page({
     return notFound();
   }
   
-  return <Room roomId={roomId}/>
+  return <PasswordProtectionWrapper room={roomId}>
+    <Room roomId={roomId}/>
+  </PasswordProtectionWrapper>
 }

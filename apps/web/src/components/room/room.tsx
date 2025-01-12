@@ -28,18 +28,18 @@ export default function Room({
           <UserCard auth={auth} />
       </div>
       
-      <SocketConnection room={roomId}>
-        <StreamsProvider>
-          <PlayersProvider>
-            <ConnectSocket>
-              <Controls />
-              <VideoSection />
-              <ChatLogs />
-              <Level />
-            </ConnectSocket>
-          </PlayersProvider>
-        </StreamsProvider>
-      </SocketConnection>
+        <SocketConnection room={roomId}>
+          <StreamsProvider>
+            <PlayersProvider>
+              <ConnectSocket>
+                <Controls />
+                <VideoSection />
+                <ChatLogs />
+                <Level />
+              </ConnectSocket>
+            </PlayersProvider>
+          </StreamsProvider>
+        </SocketConnection>
     </div>
   );
 }
