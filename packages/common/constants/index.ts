@@ -1,8 +1,13 @@
 export const WebSocketEvents = {
   // Room related
   EXISTING_USERS: "existing-users",
-  USER_JOINED: "user-joined",
+
+  // For self
   USER_CONNECT: "user-connect",
+  USER_DISCONNECT: "user-disconnect",
+
+  // For others
+  USER_JOINED: "user-joined",
   USER_LEFT: "user-left",
 
   // P2P related

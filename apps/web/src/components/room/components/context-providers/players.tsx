@@ -1,6 +1,7 @@
 import Loader from "@/web/components/room/components/loader";
 import useGlobalStore from "@/web/store/global";
 import usePlayerStore from "@/web/store/players";
+import { WebSocketEvents } from "@melo/common/constants";
 import type { PlayerData } from "@melo/types";
 import React, { createContext, useContext, useEffect, useState } from "react";
 
@@ -32,14 +33,13 @@ export default function PlayersProvider({
     setLoading(true);
     if(!socket) return console.error("Socket is not initialized");
     
-    if (socket.isRegistered("global-player-data-update")) return;
+    if (socket.isRegistered(WebSocketEvents.GLOBAL_PLAYER_DATA_UPDATE)) return;
     
-    socket.on("global-player-data-update", ({ data }) => {
+    socket.on(WebSocketEvents.GLOBAL_PLAYER_DATA_UPDATE, ({ data }) => {
       // Data comes in as Object [string]: PlayerData, we need to convert to PlayerData[]
       const players = Object.values(data as Record<string, PlayerData>);
       setPlayers(players);
     });
-
 
     // Artificially create a very small delay to show loading realistically
     new Promise((r,_) => setTimeout(r, 300)).then(() => setLoading(false));
@@ -48,7 +48,7 @@ export default function PlayersProvider({
   const handleUpdatePlayerData = (data: PlayerData) => {
     if(!socket) return console.error("Socket is not initialized");
 
-    socket.emit("player-data-update", data );
+    socket.emit(WebSocketEvents.PLAYER_DATA_UPDATE, data );
   }
   
   const getCurrentPlayer = () => {

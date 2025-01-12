@@ -1,7 +1,5 @@
 "use client";
 
-import { useParams } from "next/navigation";
-
 import ChatLogs from "@/web/components/room/components/chat-logs";
 import PlayersProvider from "@/web/components/room/components/context-providers/players";
 import ConnectSocket from "@/web/components/room/components/initialization/connect-socket";

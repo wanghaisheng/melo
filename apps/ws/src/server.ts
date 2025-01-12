@@ -7,11 +7,26 @@ import type { PlayerData } from "@melo/types";
 
 export default class Server extends BasePartyServer implements Party.Server {
   private users = new Map<string, PlayerData>();
+
+  private handleOnClose(connection: Party.Connection) {
+    this.emitAll(WebSocketEvents.USER_LEFT, {
+      id: connection.id,
+    });
+
+    if(this.users.has(connection.id)) {
+      // If has remove
+      this.users.delete(connection.id);
+    }
+
+    this.emitAll(WebSocketEvents.GLOBAL_PLAYER_DATA_UPDATE, {
+      data: Object.fromEntries(this.users),
+    });
+  }
   
   constructor(readonly room: Party.Room) {
     super(room);
 
-
+    /** USER CONNECTION HANDLER */
     this.on(WebSocketEvents.USER_CONNECT, (data, sender) => {
       const {
         auth_uid,
@@ -47,6 +62,14 @@ export default class Server extends BasePartyServer implements Party.Server {
         "users": this.getConnectionIds([sender.id]),
       }, [sender.id]);
     });
+    /** USER CONNECTION HANDLER */
+    
+    /** USER DIS-CONNECTION HANDLER */
+    this.on(WebSocketEvents.USER_DISCONNECT, (_, conn) => {
+      this.handleOnClose(conn);
+    })
+    /** USER DIS-CONNECTION HANDLER */
+    
     
     this.on(WebSocketEvents.P2P_OFFER, (data, conn) => {
       // Offer by broadcasting to the specific user only
@@ -107,18 +130,8 @@ export default class Server extends BasePartyServer implements Party.Server {
   }
 
   onClose(connection: Party.Connection): void | Promise<void> {
-    this.emitAll(WebSocketEvents.USER_LEFT, {
-      id: connection.id,
-    });
-
-    if(this.users.has(connection.id)) {
-      // If has remove
-      this.users.delete(connection.id);
-    }
-
-    this.emitAll(WebSocketEvents.GLOBAL_PLAYER_DATA_UPDATE, {
-      data: Object.fromEntries(this.users),
-    });
+    // Delegated to a custom handler that can be called by an event too
+    this.handleOnClose(connection);
   };
 
   onConnect(connection: Party.Connection, ctx: Party.ConnectionContext): void | Promise<void> {

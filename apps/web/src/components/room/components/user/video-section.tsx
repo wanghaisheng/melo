@@ -9,6 +9,9 @@ export default function VideoSection() {
   const { players } = usePlayerStore();
   
   const thisPlayer = players.find(player => player.connectionId === socket!.id);
+
+  if(!thisPlayer) return;
+  
   return (
     <div className="absolute right-2 top-2 flex flex-col items-end gap-2 z-10">
       {/* Local Video Stream */}

@@ -2,6 +2,7 @@ import { useStreams } from "@/web/components/room/components/context-providers/s
 import { DASHBOARD_PAGE_URL } from "@/web/env";
 import useGlobalStore from "@/web/store/global";
 import { useStreamsStore } from "@/web/store/streams"
+import { WebSocketEvents } from "@melo/common/constants";
 import ToggleIconButton from "@melo/ui/toggle-icon-button";
 
 import { Mic, MicOff, Camera, CameraOff, Phone, GripVertical, Settings } from "lucide-react";
@@ -21,6 +22,11 @@ export default function Controls() {
   } = useStreamsStore();
 
   const router = useRouter();
+
+  const handleRoomExit = () => {
+    socket?.emit(WebSocketEvents.USER_DISCONNECT, {});
+    router.replace(DASHBOARD_PAGE_URL);
+  }
   
   return <div className="
       absolute bottom-4 z-10 
@@ -64,10 +70,7 @@ export default function Controls() {
         disabled={false}
         on={<Phone className="rotate-[135deg]" />}
         off={<></>}
-        onClick={() => {
-          // Ends call automatically
-          router.push(DASHBOARD_PAGE_URL);
-        }}
+        onClick={handleRoomExit}
       />
     </div>
   </div>
