@@ -12,6 +12,42 @@ export default class Server extends BasePartyServer implements Party.Server {
     super(room);
 
 
+    this.on(WebSocketEvents.USER_CONNECT, (data, sender) => {
+      const {
+        auth_uid,
+      }: {
+        auth_uid: string,
+      } = data;
+      
+        // Assign position
+      if(!this.users.has(sender.id)){
+        // Add to the hash map the user data
+        this.users.set(sender.id, {
+          auth_uid,
+          connectionId: sender.id,
+          username: "User" + Math.floor(Math.random() * 1000),
+          displayName: "User" + Math.floor(Math.random() * 1000),
+          position: [0,0,0],
+          rotation: [0,0,0],
+          video: false,
+          audio: false,
+          streamStatus: "configure",
+        })
+      }
+
+      this.emitAll(WebSocketEvents.GLOBAL_PLAYER_DATA_UPDATE, {
+        data: Object.fromEntries(this.users),
+      });
+      
+      this.emitWithout(WebSocketEvents.USER_JOINED, {
+        id: sender.id,
+      }, [sender.id]);
+
+      this.emitTo(WebSocketEvents.EXISTING_USERS, {
+        "users": this.getConnectionIds([sender.id]),
+      }, [sender.id]);
+    });
+    
     this.on(WebSocketEvents.P2P_OFFER, (data, conn) => {
       // Offer by broadcasting to the specific user only
       this.emitTo(WebSocketEvents.P2P_OFFER,{
@@ -86,32 +122,7 @@ export default class Server extends BasePartyServer implements Party.Server {
   };
 
   onConnect(connection: Party.Connection, ctx: Party.ConnectionContext): void | Promise<void> {
-    // Assign position
-    if(!this.users.has(connection.id)){
-      // Add to the hash map the user data
-      this.users.set(connection.id, {
-        connectionId: connection.id,
-        username: "User" + Math.floor(Math.random() * 1000),
-        displayName: "User" + Math.floor(Math.random() * 1000),
-        position: [0,0,0],
-        rotation: [0,0,0],
-        video: false,
-        audio: false,
-        streamStatus: "configure",
-      })
-    }
-
-    this.emitAll(WebSocketEvents.GLOBAL_PLAYER_DATA_UPDATE, {
-      data: Object.fromEntries(this.users),
-    });
-    
-    this.emitWithout(WebSocketEvents.USER_JOINED, {
-      id: connection.id,
-    }, [connection.id]);
-
-    this.emitTo(WebSocketEvents.EXISTING_USERS, {
-      "users": this.getConnectionIds([connection.id]),
-    }, [connection.id]);
+    // Connect logic has been delegated to the USER_CONNECT event to wait for auth id in the payload
   }
 }
 

@@ -33,8 +33,8 @@ export default function DashboardPage() {
   }, []);
 
   return (
-      <div className="h-full w-full flex flex-col items-center gap-4">
-        <div className="flex flex-col lg:flex-row h-full w-full xl:max-w-[70%] xl:min-w-[60%] p-4">
+    <div className="h-full w-full flex flex-col items-center gap-4">
+        <div className="flex lg:flex-row h-full w-full xl:max-w-[70%] xl:min-w-[60%] p-4">
           <div className="flex-[2]">
             <RoomList rooms={rooms} />
           </div>

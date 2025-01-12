@@ -1,6 +1,7 @@
 import MediaInitialization from "@/web/components/room/components/initialization/media-initialization";
 import Loader from "@/web/components/room/components/loader";
 import useLogs from "@/web/hooks/useLogs";
+import { useAuthStore } from "@/web/store/auth";
 import useGlobalStore from "@/web/store/global";
 import { useStreamsStore } from "@/web/store/streams";
 import { WebSocketEvents } from "@melo/common/constants";
@@ -27,6 +28,7 @@ interface StreamsProviderProps {
 export default function StreamsProvider({
   children,
 }: StreamsProviderProps) {
+  const { auth } = useAuthStore();
   const { socket, addSocketConnectCallbacks } = useGlobalStore();
   const { addNewLog } = useLogs();
   

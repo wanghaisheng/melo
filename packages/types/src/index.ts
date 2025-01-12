@@ -1,4 +1,5 @@
 export type PlayerData = {
+  auth_uid: string;
   connectionId: string;
   username: string;
   displayName: string;
