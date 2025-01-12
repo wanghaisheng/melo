@@ -1,5 +1,5 @@
 import type { FirestoreRoom } from "@melo/types";
-import { addDoc, collection, doc, DocumentSnapshot, Firestore, getDoc, type DocumentData } from "firebase/firestore";
+import { addDoc, collection, doc, DocumentSnapshot, Firestore, getDoc, getDocs, query, where, type DocumentData } from "firebase/firestore";
 import { hash } from "bcryptjs";
 
 namespace MeloRoomHelpers {
@@ -58,6 +58,13 @@ namespace MeloRoomHelpers {
     return extractRoomDataFromDocSnapshot(room);
   }
  
+  /**
+   * Attempts to retrieve a room document from Firestore by its ID.
+   *
+   * @param firestore - The Firestore instance to use for the query.
+   * @param roomId - The ID of the room to retrieve.
+   * @returns A promise that resolves to the room data if found, or null if not found or an error occurs.
+   */
   export async function tryGetRoom(
     firestore: Firestore, 
     roomId: string
@@ -67,6 +74,21 @@ namespace MeloRoomHelpers {
       const room = await getDoc(roomRef);
 
       return extractRoomDataFromDocSnapshot(room);
+    } catch(_) {
+      return null;
+    }
+  }
+
+  export async function tryGetRoomFromNumber(firestore:Firestore, number: string) : Promise<FirestoreRoom | null> {
+    try {
+      const roomRef = collection(firestore, "rooms");
+      const q = query(roomRef, where("roomNumber", "==", number));
+
+      const snapshot = await getDocs(q);
+      
+      if ( snapshot.docs.length < 0 ) return null;
+
+      return extractRoomDataFromDocSnapshot(snapshot.docs[0]);
     } catch(_) {
       return null;
     }
