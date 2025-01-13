@@ -1,9 +1,6 @@
 // usePlayerStore.ts
 import { create } from 'zustand';
 
-import useGlobalStore from './global';
-import Socket from "@/web/core/socket";
-
 import type { PlayerData } from '@melo/types';
 
 // Define the PlayerStore type
@@ -13,7 +10,7 @@ type PlayerStore = {
 };
 
 // Create the Zustand store
-const usePlayerStore = create<PlayerStore>((set, get) => ({
+const usePlayerStore = create<PlayerStore>((set) => ({
   players: [],
   setPlayers: (newPlayers) => set({ players: newPlayers }),
 }));

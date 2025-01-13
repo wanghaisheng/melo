@@ -70,7 +70,7 @@ export default function SignUpPage() {
           />
           <div className="text-center space-y-4 max-w-md">
             <h2 className="text-3xl font-bold text-gray-900">
-              Join Melo's Virtual Spaces
+              Join Melo&apos;s Virtual Spaces
             </h2>
             <p className="text-lg text-gray-600">
               Sign up to start creating and collaborating in immersive virtual environments designed for modern teams and communities.

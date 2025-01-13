@@ -40,7 +40,7 @@ export default function AuthWrapper({
       }
     })
 
-  }, []);
+  }, [resetAuth, setAuth]);
 
   /** REDIRECTION LOGIC IF NO USER IS PRESENT */
   const urlpathname = usePathname();
@@ -50,7 +50,7 @@ export default function AuthWrapper({
     if ( auth?.status === "auth" && urlpathname.startsWith("/auth")) {
       router.push(DASHBOARD_PAGE_URL);
     }
-  }, [auth]);
+  }, [auth, router, urlpathname]);
 
   /** SHOW AUTHENTICATION LOADING WIDGET IF THE FIREBASE IS STILL GETTING THE USER */
   if ( auth === null ) {

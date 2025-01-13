@@ -1,5 +1,4 @@
-import { useStreamsStore } from "@/web/store/streams";
-import { CameraOff, MicOff } from "lucide-react";
+import { CameraOff } from "lucide-react";
 import { useEffect, useRef } from "react";
 import { Vector3 } from "three";
 
@@ -43,7 +42,7 @@ export default function VideoStream({
     const volume = 1 / (1 + Math.exp(-VOLUME_DECAY_RATE * (VOLUME_MAX_DISTANCE_CAN_HEAR - distance)))
 
     videoRef.current.volume = volume;
-  }, [playerPosition, userPosition, isLocal]);
+  }, [playerPosition, userPosition, isLocal, disableDynamicVolume]);
 
   useEffect(() => {
     if (!stream) return;

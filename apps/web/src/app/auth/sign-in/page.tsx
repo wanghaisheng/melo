@@ -13,7 +13,7 @@ import Link from "next/link"
 import { REDIRECT_SIGNUP_PAGE_URL } from "@/web/env"
 
 import { fireauth, firestore } from "@/web/firebase/init"
-import { GoogleAuthProvider, signInWithEmailAndPassword, signInWithPopup } from "firebase/auth";
+import { signInWithEmailAndPassword } from "firebase/auth";
 
 import { useToast } from "@melo/ui/hooks/use-toast";
 import type { FirebaseError } from "firebase/app"
@@ -181,7 +181,7 @@ export default function SignInPage() {
           </div>
           <Link href={REDIRECT_SIGNUP_PAGE_URL}>
             <Button variant="ghost" className="bg-blue-500 text-white">
-              Don't have an account? Sign up now! <ArrowUpRightFromSquareIcon />
+              Don&apos;t have an account? Sign up now! <ArrowUpRightFromSquareIcon />
             </Button>
           </Link>
         </div>

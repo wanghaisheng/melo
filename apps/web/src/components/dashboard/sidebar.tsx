@@ -11,10 +11,9 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  SidebarProvider,
   SidebarSeparator,
 } from "@melo/ui/ui/sidebar";
-import { HelpCircle, Settings, Users, PlusCircle, ChevronRight, Phone, DoorClosed, Home } from 'lucide-react';
+import { HelpCircle, Settings, Users, PlusCircle, Phone, DoorClosed, Home } from 'lucide-react';
 import Link from "next/link";
 
 export default function DashboardSidebar() {

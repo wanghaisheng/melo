@@ -43,7 +43,7 @@ export default function PlayersProvider({
 
     // Artificially create a very small delay to show loading realistically
     new Promise((r,_) => setTimeout(r, 300)).then(() => setLoading(false));
-  }, [socket]);
+  }, [setPlayers, socket]);
 
   const handleUpdatePlayerData = (data: PlayerData) => {
     if(!socket) return console.error("Socket is not initialized");
