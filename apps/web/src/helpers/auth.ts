@@ -22,7 +22,7 @@ namespace AuthHelpers {
     const q = query(userCollectionsRef, where("__auth_uid", "==", uid));
     const snapshot = await getDocs(q);
     
-    if ( snapshot.docs.length < 0 ) return null;
+    if ( snapshot.docs.length <= 0 ) return null;
     
     return {
       ...(snapshot.docs[0].data() as Omit<FirestoreAuthUserData, "id">),
