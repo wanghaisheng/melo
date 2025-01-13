@@ -3,7 +3,8 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./*"],
+      // "@/*": ["./*"],
+      "#base/*": ["./*.ts","./*.tsx"],
       "react": [ "./node_modules/@types/react" ]
     },
   }
