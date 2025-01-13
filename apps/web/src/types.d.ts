@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-expressions */
 // Shared types between server and client is on package: @melo/types
 
 declare global 

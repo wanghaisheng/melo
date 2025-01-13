@@ -2,8 +2,6 @@ import Socket from '@/web/core/socket';
 import { WebSocketEvents } from '@melo/common/constants';
 import { create } from 'zustand';
 
-import useGlobalStore from '@/web/store/global';
-
 interface StreamsState {
   peersStream: Map<string, MediaStream | null>;
   loading: boolean;

@@ -3,8 +3,7 @@
 import { useState } from 'react';
 import { Button } from '@melo/ui/ui/button';
 import { Input } from '@melo/ui/ui/input';
-import { Card, CardContent, CardHeader, CardTitle } from '@melo/ui/ui/card';
-import { Lock, KeyRound, Loader2 } from 'lucide-react';
+import { KeyRound, Loader2 } from 'lucide-react';
 import type { FirestoreRoom } from '@melo/types';
 import { compare } from 'bcryptjs';
 import Loader from '@/web/components/room/components/loader';
@@ -35,7 +34,7 @@ export default function PasswordProtection({
       } else {
         setError('Incorrect password. Please try again.');
       }
-    } catch (err) {
+    } catch (_) {
       setError('Failed to verify password. Please try again.');
     } finally {
       setIsVerifying(false);
@@ -59,7 +58,7 @@ export default function PasswordProtection({
         <h1 className="text-4xl font-thin text-gray-600 mb-1">Password Protected</h1>
         
         <p className="text-xs text-gray-500 mb-4">
-          Enter the password to join room "{room.name}"
+          Enter the password to join room &quot;{room.name}&quot;
         </p>
         
         <form onSubmit={handleSubmit} className="space-y-4 w-64">

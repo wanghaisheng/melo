@@ -50,5 +50,12 @@
   },
   "files": [
     "dist"
-  ]
+  ],
+
+  "imports": {
+    "#base/*": ["./*.ts","./*.tsx"],
+    "#base/components/ui/*": ["./components/ui/*.tsx"],
+    "#base/hooks/*": ["./hooks/*.ts"],
+    "#base/styles.css": ["./src/styles.css"]
+  }
 }

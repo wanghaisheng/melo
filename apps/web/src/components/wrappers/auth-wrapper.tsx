@@ -5,7 +5,8 @@ import { fireauth, firestore } from "@/web/firebase/init";
 import AuthHelpers from "@/web/helpers/auth";
 import { useAuthStore } from "@/web/store/auth";
 import { usePathname, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
+import { signOut } from "firebase/auth";
 
 export default function AuthWrapper({
   children,
@@ -24,7 +25,10 @@ export default function AuthWrapper({
         // Try to get the auth user data from firestore
         const firestoreUser = await AuthHelpers.tryGetExistingUserFromFirestore(firestore, user.uid);
 
-        if (!firestoreUser) return console.error("Couldn't find user data for the current user in firestore.")
+        if (!firestoreUser) {
+          signOut(fireauth);
+          return console.error("Couldn't find user data for the current user in firestore.")
+        } 
         
         setAuth({
           user: user,
@@ -36,7 +40,7 @@ export default function AuthWrapper({
       }
     })
 
-  }, []);
+  }, [resetAuth, setAuth]);
 
   /** REDIRECTION LOGIC IF NO USER IS PRESENT */
   const urlpathname = usePathname();
@@ -46,7 +50,7 @@ export default function AuthWrapper({
     if ( auth?.status === "auth" && urlpathname.startsWith("/auth")) {
       router.push(DASHBOARD_PAGE_URL);
     }
-  }, [auth]);
+  }, [auth, router, urlpathname]);
 
   /** SHOW AUTHENTICATION LOADING WIDGET IF THE FIREBASE IS STILL GETTING THE USER */
   if ( auth === null ) {

@@ -22,7 +22,7 @@ interface AuthStore {
   resetAuth: () => void;
 }
 
-export const useAuthStore = create<AuthStore>((set, get) => ({
+export const useAuthStore = create<AuthStore>((set) => ({
   auth: null,
   setAuth: auth => set({ auth }),
   resetAuth: () => set({ auth: __authDefaultValue })

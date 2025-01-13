@@ -1,5 +1,5 @@
 import { Canvas } from "@react-three/fiber";
-import { MapControls, OrthographicCamera, Stats } from "@react-three/drei";
+import { MapControls, OrthographicCamera } from "@react-three/drei";
 
 import useGlobalStore from "@/web/store/global";
 

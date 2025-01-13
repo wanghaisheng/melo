@@ -51,7 +51,7 @@ function ModelLoaderFallback({
     return () => {
       handleIncreaseLoadCount();
     }
-  }, [])
+  }, [handleIncreaseLoadCount])
   
   return <Html fullscreen>
     <Loader progress={70} title="Models Loading..." subtitle={`The client is loading environments.`} />
@@ -67,10 +67,10 @@ export default function ModelsLoader({
 
   useEffect(() => {
     if (disableLoader || loadCount >= models.length) setModelsLoading(false);
-  }, [loadCount]);
+  }, [disableLoader, loadCount, models.length, setModelsLoading]);
 
   return models.map((m, i) => {
-    return <Suspense fallback={disableLoader ? null : <ModelLoaderFallback handleIncreaseLoadCount={() => setLoadCount(c => c + 1)} />}>
+    return <Suspense key={i} fallback={disableLoader ? null : <ModelLoaderFallback handleIncreaseLoadCount={() => setLoadCount(c => c + 1)} />}>
       <Model path={m.path} hideShadow={m.hideShadow ?? false} name={m.name} props={m.props}/>
     </Suspense>
   })

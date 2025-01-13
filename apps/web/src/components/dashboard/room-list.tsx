@@ -1,7 +1,7 @@
 "use client";
 
 import { Lock, Users, Calendar } from "lucide-react";
-import { Card, CardContent, CardFooter } from "@melo/ui/ui/card";
+import { Card, CardContent } from "@melo/ui/ui/card";
 import { Button } from "@melo/ui/ui/button";
 import { Badge } from "@melo/ui/ui/badge";
 import { ScrollArea } from "@melo/ui/ui/scroll-area";
@@ -9,7 +9,7 @@ import type { FirestoreRoom } from "@melo/types";
 import Link from "next/link";
 
 // Room Card Component
-const RoomCard = ({ room }: { room: FirestoreRoom }) => {
+function RoomCard({ room }: { room: FirestoreRoom }) {
   const formatDate = (date: Date) => {
     return new Intl.DateTimeFormat('en-US', {
       month: 'short',

@@ -29,7 +29,7 @@ export default function SocketConnection({ children, room } : SocketConnectionPr
         auth_uid: auth.user!.uid,
       });
     });
-  }, []);
+  }, [addSocketConnectCallbacks, auth, room, setSocket]);
 
   return children;
 }
