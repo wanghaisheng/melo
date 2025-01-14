@@ -5,7 +5,8 @@
   "scripts": {
     "dev": "turbo dev",
     "build": "turbo build",
-    "prepare": "husky",
+    "lint": "turbo lint",
+    "prepare": "husky --ui tui",
     "syncpack-list": "syncpack list-mismatches"
   },
   "author": "saphalpdyl",

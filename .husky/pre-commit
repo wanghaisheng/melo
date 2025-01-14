@@ -1,1 +1,2 @@
 pnpm run syncpack-list
+pnpm run lint
