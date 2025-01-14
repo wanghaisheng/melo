@@ -6,7 +6,8 @@
     "dev": "turbo dev",
     "build": "turbo build",
     "lint": "turbo lint",
-    "prepare": "husky --ui tui",
+    "husky-lint": "turbo lint --ui stream",
+    "prepare": "husky",
     "syncpack-list": "syncpack list-mismatches"
   },
   "author": "saphalpdyl",
