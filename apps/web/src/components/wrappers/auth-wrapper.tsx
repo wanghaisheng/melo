@@ -27,7 +27,7 @@ export default function AuthWrapper({
 
         if (!firestoreUser) {
           signOut(fireauth);
-          return console.error("Couldn't find user data for the current user in firestore.")
+          return
         } 
         
         setAuth({

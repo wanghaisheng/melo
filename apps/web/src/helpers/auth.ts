@@ -1,12 +1,12 @@
 import type { FirestoreAuthUserData } from "@melo/types";
-import { GoogleAuthProvider, signInWithPopup, type Auth, type User } from "firebase/auth";
+import { FirebaseError } from "firebase/app";
+import { AuthCredential, createUserWithEmailAndPassword, GoogleAuthProvider, signInWithCredential, signInWithEmailAndPassword, signInWithPopup, signOut, type Auth, type User } from "firebase/auth";
 import { 
+  addDoc,
   collection,
-  doc, 
   Firestore, 
   getDocs, 
   query, 
-  setDoc,
   where, 
 } from "firebase/firestore";
 
@@ -49,13 +49,30 @@ namespace AuthHelpers {
     if ( firestoreUserData ) return;
     
     // Create a users collection in firestore collection
-    // collection("users")
-    await setDoc(doc(firestore, "users", crypto.randomUUID()), {
+    await addDoc(collection(firestore, "users"), {
       role: "admin",
       username: name,
       __auth_uid: user.uid,
     });
   }
+  
+  export async function signUpUserWithEmailAndPassword(auth: Auth, firestore: Firestore, username: string, email: string, password: string) {
+    // Check for existing user
+    try {
+      const user = await createUserWithEmailAndPassword(auth, email, password);
+      await signOut(auth);
+      await createUserDataInFirestore(firestore, user.user, username);
+
+      await signInWithEmailAndPassword(auth, email, password);
+      
+    } catch(e) {
+      if ( e instanceof FirebaseError ) {
+        return e.code;
+      }
+      return "5XX_INTERNAL_ERROR";
+    }
+  }
+
   
   /**
    * Signs up a user using Google authentication and creates user data in Firestore.
@@ -83,10 +100,16 @@ namespace AuthHelpers {
       authProvider.addScope("profile")
       authProvider.addScope("email")
     
-      const user = await signInWithPopup(auth, authProvider);
-      await createUserDataInFirestore(firestore, user.user, user.user.displayName ?? "No Name")
+      const userCreds = await signInWithPopup(auth, authProvider);
+      const authCreds = await GoogleAuthProvider.credentialFromResult(userCreds);
+      
+      // Need to wait for the data to be created in firestore
+      await signOut(auth);
+      await createUserDataInFirestore(firestore, userCreds.user, userCreds.user.displayName ?? "No Name")
+
+      await signInWithCredential(auth, authCreds as AuthCredential);
   
-      return [user.user, null];
+      return [userCreds.user, null];
     } catch(e) {
       return [null, e];
     }
