@@ -61,7 +61,7 @@ export default function UserCard({
             
           </div>
           <div className="flex flex-col items-start justify-center">
-            <h3 className="text-[11px] font-semibold truncate overflow-ellipsis max-w-36">{ auth.user!.displayName || auth.user!.email }</h3>
+            <h3 className="text-[11px] font-semibold truncate overflow-ellipsis max-w-36">{ auth.data?.username || auth.user!.displayName || auth.user!.email }</h3>
             <p className="text-[10px] text-gray-800">User</p>
           </div>
           <div className="flex-1"></div>
