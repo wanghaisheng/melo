@@ -67,7 +67,7 @@ export default function ModelsLoader({
 
   useEffect(() => {
     if (disableLoader || loadCount >= models.length) setModelsLoading(false);
-  }, []);
+  }, [disableLoader, loadCount]);
 
   return models.map((m, i) => {
     return <Suspense key={i} fallback={disableLoader ? null : <ModelLoaderFallback handleIncreaseLoadCount={() => setLoadCount(c => c + 1)} />}>
