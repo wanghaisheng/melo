@@ -1,7 +1,7 @@
 import VideoStream from "@/web/components/room/components/video-stream";
 import { Button } from "@melo/ui/ui/button";
 import { Info, SquarePlus } from "lucide-react";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import MediaSelect from "./components/media-select";
 
 interface MediaInitializationProps {
@@ -23,7 +23,7 @@ export default function MediaInitialization({
   const [isAudioEnabled, setAudioEnabled] = useState(true);
   const [stream, setStream] = useState<MediaStream | null>(null);
 
-  const configureStreamMedia = useCallback(async (videoDeviceId?: string, audioDeviceId?: string) => {
+  const configureStreamMedia = async (videoDeviceId?: string, audioDeviceId?: string) => {
     // Stop all tracks in the existing stream if it exists
     if (stream) {
       stream.getTracks().forEach(track => track.stop());
@@ -50,7 +50,7 @@ export default function MediaInitialization({
     } catch (error) {
       console.error('Error getting media stream:', error);
     }
-  }, [isAudioEnabled, isVideoEnabled, stream]);
+  };
 
   const getAllMediaInputs = async () => {
     const inputs = await navigator.mediaDevices.enumerateDevices();
@@ -63,7 +63,8 @@ export default function MediaInitialization({
   useEffect(() => {
     configureStreamMedia();
     getAllMediaInputs();
-  }, [configureStreamMedia]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     if (stream) {
