@@ -34,11 +34,13 @@ export default function MediaSelect({
           <SelectValue placeholder="Select device" />
         </SelectTrigger>
         <SelectContent>
-          {inputDevices.map(device => (
-            <SelectItem key={device.deviceId} value={device.deviceId} className="capitalize">
+          {inputDevices.map(device => {
+            if ( !device || device.deviceId === "" ) return;
+            
+            return <SelectItem key={device.deviceId} value={device.deviceId ?? ""} className="capitalize">
               {device.label}
             </SelectItem>
-          ))}
+          })}
         </SelectContent>
       </Select>
     </div>

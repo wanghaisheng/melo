@@ -1,7 +1,8 @@
+import { useEffect, useState } from "react";
 import VideoStream from "@/web/components/room/components/video-stream";
 import { Button } from "@melo/ui/ui/button";
-import { Info, SquarePlus } from "lucide-react";
-import { useEffect, useState } from "react";
+import { Alert, AlertTitle, AlertDescription } from "@melo/ui/ui/alert";
+import { Info, SquarePlus, AlertCircle } from "lucide-react";
 import MediaSelect from "./components/media-select";
 
 interface MediaInitializationProps {
@@ -22,8 +23,12 @@ export default function MediaInitialization({
   const [isVideoEnabled, setVideoEnabled] = useState(true);
   const [isAudioEnabled, setAudioEnabled] = useState(true);
   const [stream, setStream] = useState<MediaStream | null>(null);
+  const [error, setError] = useState<{ title: string; description: string } | null>(null);
 
   const configureStreamMedia = async (videoDeviceId?: string, audioDeviceId?: string) => {
+    // Clear any existing error
+    setError(null);
+    
     // Stop all tracks in the existing stream if it exists
     if (stream) {
       stream.getTracks().forEach(track => track.stop());
@@ -45,13 +50,39 @@ export default function MediaInitialization({
       // Update enabled states based on current settings
       newStream.getVideoTracks().forEach(track => track.enabled = isVideoEnabled);
       newStream.getAudioTracks().forEach(track => track.enabled = isAudioEnabled);
+      getAllMediaInputs();
       
       return newStream;
     } catch (error) {
-      console.error('Error getting media stream:', error);
+      if (error instanceof DOMException) {
+      console.log(error.name);
+        switch (error.name) {
+          case "NotAllowedError":
+            // Skip showing alert for permission denied
+            setError({
+              title: "Permission required",
+              description: "The application requires camera and microphone access."
+            });
+            break;
+          case "NotReadableError":
+            setError({
+              title: "Device Access Error",
+              description: "Could not access your media device. It may be in use by another application."
+            });
+            break;
+          case "NotFoundError":
+            setError({
+              title: "Device Not Found",
+              description: "The requested media device was not found. Please check your camera and microphone connections."
+            });
+            break;
+        }
+      }
+      console.log('Error getting media stream:', error);
     }
   };
 
+  // Rest of the component remains the same...
   const getAllMediaInputs = async () => {
     const inputs = await navigator.mediaDevices.enumerateDevices();
     const inputGroups = Object.groupBy(inputs, i => i.kind);
@@ -117,47 +148,56 @@ export default function MediaInitialization({
             hasVideo={true}
             hasAudio={false}
           />
-        )
-      }
-    </div>
-    <span className="text-xs text-gray-500 inline-flex items-center font-sans gap-1 mt-2">
-      <Info size={12} />
-      Preview your camera to ensure proper lighting and positioning
-    </span>
-    
-    <div className="mt-4"></div>
-    
-    <MediaSelect
-      mediaEnabled={isVideoEnabled}
-      mediaToggleHandler={setVideoEnabled}
-      currentDeviceId={currentVideoDeviceId}
-      inputDevices={videoDevices}
-      onDeviceChange={(deviceId) => changeDevices(deviceId, "video")}
-      kind="video"
-    />
+        )}
+      </div>
+      {error && (
+        <Alert variant={error.title === "Permission required" ? "default" : "destructive"} className="mt-4 w-96">
+          {
+            error.title === "Permission required" && <AlertCircle className="w-4 h-4" />
+          }
+          <AlertTitle>{error.title}</AlertTitle>
+          <AlertDescription className="text-xs">{error.description}</AlertDescription>
+        </Alert>
+      )}
 
-    <MediaSelect
-      mediaEnabled={isAudioEnabled}
-      mediaToggleHandler={setAudioEnabled}
-      currentDeviceId={currentAudioDeviceId}
-      inputDevices={audioDevices}
-      onDeviceChange={(deviceId) => changeDevices(deviceId, "audio")}
-      kind="audio"
-    />
+      <span className="text-xs text-gray-500 inline-flex items-center font-sans gap-1 mt-2">
+        <Info size={12} />
+        Preview your camera to ensure proper lighting and positioning
+      </span>
+      
+      <div className="mt-4"></div>
+      
+      <MediaSelect
+        mediaEnabled={isVideoEnabled}
+        mediaToggleHandler={setVideoEnabled}
+        currentDeviceId={currentVideoDeviceId}
+        inputDevices={videoDevices}
+        onDeviceChange={(deviceId) => changeDevices(deviceId, "video")}
+        kind="video"
+      />
+
+      <MediaSelect
+        mediaEnabled={isAudioEnabled}
+        mediaToggleHandler={setAudioEnabled}
+        currentDeviceId={currentAudioDeviceId}
+        inputDevices={audioDevices}
+        onDeviceChange={(deviceId) => changeDevices(deviceId, "audio")}
+        kind="audio"
+      />
 
       <p className="text-xs text-neutral-400 font-sans mt-3 mb-2">
-      All devices configured properly • Ready to join
-    </p>
-    <Button 
-      className="bg-lime-500 px-6 mx-auto lg:mx-0"
-      onClick={() => {
-        if (stream) {
-          onInitialize(stream, isVideoEnabled, isAudioEnabled, currentVideoDeviceId!, currentAudioDeviceId!);
-        }
-      }}
-    >
-      Join
-      <SquarePlus />
-    </Button>
-  </div>;
+        All devices configured properly • Ready to join
+      </p>
+      <Button 
+        className="bg-lime-500 px-6 mx-auto lg:mx-0"
+        onClick={() => {
+          if (stream) {
+            onInitialize(stream, isVideoEnabled, isAudioEnabled, currentVideoDeviceId!, currentAudioDeviceId!);
+          }
+        }}
+      >
+        Join
+        <SquarePlus />
+      </Button>
+    </div>
 }
