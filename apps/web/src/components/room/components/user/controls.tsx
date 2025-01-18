@@ -19,12 +19,14 @@ export default function Controls() {
     isVideoEnabled,
     toggleLocalAudio,
     toggleLocalVideo,
+    localStream,
   } = useStreamsStore();
 
   const router = useRouter();
 
   const handleRoomExit = () => {
     socket?.emit(WebSocketEvents.USER_DISCONNECT, {});
+    localStream?.getTracks().forEach(t => t.stop());
     router.replace(DASHBOARD_PAGE_URL);
   }
   
