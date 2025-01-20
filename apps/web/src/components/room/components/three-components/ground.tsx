@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
-import { type ThreeEvent } from "@react-three/fiber";
+import { useThree, type ThreeEvent } from "@react-three/fiber";
 
-// import { usePlayers } from "@/web/components/room/components/context-providers/players";
+import { usePlayers } from "@/web/components/room/components/context-providers/players";
 import * as THREE from "three";
 import { Pathfinding } from "three-pathfinding";
 import { useGLTF } from "@react-three/drei";
@@ -13,32 +13,53 @@ function Ground() {
   const [_, setCursorPosition] = useState<[number,number,number] | null>(null);
   const [showCursor, setShowCursor] = useState(false);
 
-  // const { handlePositionChange } = usePlayers();
+  const { handlePositionChange, getCurrentPlayer } = usePlayers();
+  const currentPlayer = getCurrentPlayer();
 
   // This will be used to track mouse movement to determine if the click was
   // for moving the screen or the player
   const mouse = useRef<THREE.Vector2>(new THREE.Vector2());
   const mouseDown = useRef<THREE.Vector2>(new THREE.Vector2());
 
+  const { camera } = useThree();
+  
   // Navigation
   const { scene: navMeshScene } = useGLTF("/static/navmesh.glb");
   
   const [ navMeshGeometries, setNavMeshGeometries ] = useState<THREE.BufferGeometry[]>([]);
   const navMeshRefs = useRef<(THREE.Mesh | null)[]>([]);
-  const navMeshGroupRef = useRef<THREE.Group | null>(null);
   const raycaster = useRef<THREE.Raycaster>(new THREE.Raycaster());
   const pathfinder = useRef<Pathfinding>(new Pathfinding());
   const targetPosition = useRef<THREE.Vector3>(new THREE.Vector3());
   const path = useRef<THREE.Vector3[]>([]);
   const groupID = useRef<number | null>(null);
-  const zoneID = useRef<number | null>(null);
+  const zoneID = useRef<string | null>(null);
 
+  const findIntersectedNavMesh = (raycaster: THREE.Raycaster) => {
+    for (let i = 0; i < navMeshRefs.current.length; i++) {
+      const mesh = navMeshRefs.current[i];
+      if (!mesh) continue;
+      
+      const intersects = raycaster.intersectObject(mesh);
+      if (intersects.length) {
+        return {
+          intersect: intersects[0],
+          zoneName: navMeshGeometries[i].name
+        };
+      }
+    }
+    return null;
+  };
+  
   useEffect(() => {
     const navmeshes: THREE.BufferGeometry[] = [];
 
     navMeshScene.traverse(o => {
       if ( o.type === "Mesh" && o.name.startsWith(NAVMESH_MESH_NAME_PREFIX) ) {
-        navmeshes.push((o as THREE.Mesh).geometry);
+        const geom = (o as THREE.Mesh).geometry.clone();
+        geom.name = o.name.split(NAVMESH_MESH_NAME_PREFIX)[1];
+        
+        navmeshes.push(geom);
       }
     });
 
@@ -80,9 +101,40 @@ function Ground() {
     mouseDown.current.y = (e.clientY / window.innerHeight) * 2 + 1;
     
     if (
-      Math.abs(mouse.current.x - mouseDown.current.x) > MOUSE_MOVE_THRESHOLD_DIST ||
-      Math.abs(mouse.current.y - mouseDown.current.y) > MOUSE_MOVE_THRESHOLD_DIST
+      Math.abs(mouse.current.x - mouseDown.current.x) < MOUSE_MOVE_THRESHOLD_DIST ||
+      Math.abs(mouse.current.y - mouseDown.current.y) < MOUSE_MOVE_THRESHOLD_DIST
     ) return; // If the mouse has moved ignore the player move
+    
+    raycaster.current.setFromCamera(mouse.current, camera);
+    const intersectResult = findIntersectedNavMesh(raycaster.current);
+
+    if ( !intersectResult ) return;
+
+    const { intersect, zoneName } = intersectResult;
+
+    if ( zoneID.current === null ) {
+      handlePositionChange(intersect.point.toArray());
+      targetPosition.current.copy(intersect.point);
+      zoneID.current = zoneName;
+      groupID.current = pathfinder.current.getGroup(zoneName, new THREE.Vector3(...currentPlayer!.position));
+
+      return;
+    }
+
+    targetPosition.current.copy(intersect.point);
+
+    if ( !zoneID.current || groupID.current === null ) return;
+
+    const foundPath = pathfinder.current.findPath(
+      new THREE.Vector3(...currentPlayer!.position),
+      targetPosition.current,
+      zoneID.current,
+      groupID.current,
+    );
+
+    if ( foundPath && foundPath.length ) {
+      path.current = foundPath;
+    }
   }
 
   return <>
