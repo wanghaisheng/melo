@@ -1,10 +1,13 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { type ThreeEvent } from "@react-three/fiber";
 
 // import { usePlayers } from "@/web/components/room/components/context-providers/players";
-import { Vector2 } from "three";
+import * as THREE from "three";
+import { Pathfinding } from "three-pathfinding";
+import { useGLTF } from "@react-three/drei";
 
 const MOUSE_MOVE_THRESHOLD_DIST = 0.01;
+const NAVMESH_MESH_NAME_PREFIX = "NavMesh_";
 
 function Ground() {
   const [_, setCursorPosition] = useState<[number,number,number] | null>(null);
@@ -14,9 +17,42 @@ function Ground() {
 
   // This will be used to track mouse movement to determine if the click was
   // for moving the screen or the player
-  const mouse = useRef<Vector2>(new Vector2());
-  const mouseDown = useRef<Vector2>(new Vector2());
+  const mouse = useRef<THREE.Vector2>(new THREE.Vector2());
+  const mouseDown = useRef<THREE.Vector2>(new THREE.Vector2());
+
+  // Navigation
+  const { scene: navMeshScene } = useGLTF("/static/navmesh.glb");
   
+  const [ navMeshGeometries, setNavMeshGeometries ] = useState<THREE.BufferGeometry[]>([]);
+  const navMeshRefs = useRef<(THREE.Mesh | null)[]>([]);
+  const navMeshGroupRef = useRef<THREE.Group | null>(null);
+  const raycaster = useRef<THREE.Raycaster>(new THREE.Raycaster());
+  const pathfinder = useRef<Pathfinding>(new Pathfinding());
+  const targetPosition = useRef<THREE.Vector3>(new THREE.Vector3());
+  const path = useRef<THREE.Vector3[]>([]);
+  const groupID = useRef<number | null>(null);
+  const zoneID = useRef<number | null>(null);
+
+  useEffect(() => {
+    const navmeshes: THREE.BufferGeometry[] = [];
+
+    navMeshScene.traverse(o => {
+      if ( o.type === "Mesh" && o.name.startsWith(NAVMESH_MESH_NAME_PREFIX) ) {
+        navmeshes.push((o as THREE.Mesh).geometry);
+      }
+    });
+
+    setNavMeshGeometries(navmeshes);
+  }, [navMeshScene]);
+
+  useEffect(() => {
+    /** SETUP NAVIGATION ZONES */
+    navMeshGeometries.forEach(mesh => {
+      const zoneName = mesh.name.split("_")[1];
+      const zone = Pathfinding.createZone(mesh);
+      pathfinder.current.setZoneData(zoneName, zone);
+    })
+  }, [navMeshGeometries]);
 
   const handlePointerMove = (event: ThreeEvent<PointerEvent>) => {
     // Only update cursor if we're interacting with the ground mesh
