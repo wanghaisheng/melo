@@ -105,6 +105,18 @@ function Ground() {
       onPointerUp={handlePointerUp}
     >
       {/* NavMeshes will be laid out here */}
+      {
+        navMeshGeometries.map((geom, i) => (
+          <group key={geom.uuid} position={[0,0.5,0]}>
+            <mesh
+              ref={el => navMeshRefs.current[i] = el}
+              visible={false}
+            >
+              <primitive object={geom} attach="geometry" />
+            </mesh>
+          </group>
+        ))
+      }
     </group>
   </> 
 }
