@@ -15,9 +15,12 @@ export default function MoveTargetIndicator() {
 
   return (
     <group position={[0, 0.2, 0]}>
+      {/* @ts-expect-error */}
       <animated.mesh rotation={[-Math.PI / 2, 0, 0]} scale={scale}>
         <ringGeometry args={[0.1, 0.15]} />
+        {/* @ts-expect-error */}
         <animated.meshBasicMaterial color="#fff" transparent opacity={opacity} />
+      {/* @ts-expect-error */}
       </animated.mesh>
     </group>
   )
