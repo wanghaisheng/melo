@@ -1,6 +1,6 @@
 import { Html } from "@react-three/drei";
 import { useThree, useFrame } from "@react-three/fiber";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
 
 import type { PlayerData } from "@melo/types";
@@ -37,6 +37,12 @@ export default function Player({
     return (1/35) * zoom - (1/14);
   };
 
+  useEffect(() => {
+    if ( meshRef.current ) {
+      meshRef.current.position.set(...player.position);
+    }
+  }, []);
+  
   useFrame((_, delta) => {
     if ( meshRef.current ) {
       const direction = new THREE.Vector3().subVectors(targetPosition.current, currentPosition.current);
