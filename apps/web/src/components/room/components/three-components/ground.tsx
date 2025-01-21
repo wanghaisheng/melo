@@ -88,8 +88,10 @@ function Ground() {
       // Remove the first element ( i.e current target and change target )
       path.current.shift();
     }
-
-    handlePositionChange(currentTargetPosition.toArray());
+    
+    if ( !(new THREE.Vector3(...currentPlayer!.position).equals(currentTargetPosition)) ){
+      handlePositionChange(currentTargetPosition.toArray());
+    }
   });
 
   // const handlePointerMove = () => {
@@ -164,6 +166,7 @@ function Ground() {
       <boxGeometry args={[100,2.35,100]} />
       <meshStandardMaterial color="#3B8B5D" />
     </mesh>
+
     {/* {
       showCursor && <Pointer 
         cursorPosition={cursorPosition}
