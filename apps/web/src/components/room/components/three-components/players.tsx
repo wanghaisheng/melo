@@ -12,14 +12,12 @@ export default function Players() {
     players,
   } = usePlayerStore();
   const { getCurrentPlayer } = usePlayers();
-  
   const { localStream, peersStream } = useStreamsStore();
-
   
   const currentPlayer = getCurrentPlayer();
 
   if (!currentPlayer) return null;
-  
+
   return players.map(player => (
     <Player 
       key={player.connectionId}

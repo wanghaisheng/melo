@@ -18,15 +18,16 @@ interface PlayersContext {
   handleDisplayNameChange(displayName: string): void;
 }
 
+let prevChangedPosition: [number,number,number] | null = null;
+
 export default function PlayersProvider({
   children,
 }: PlayersProviderProps) {
   const {
-    players,
     setPlayers,
+    players,
   } = usePlayerStore();
   const { socket } = useGlobalStore();
-
   const [ loading, setLoading ] = useState(true);
   
   useEffect(() => {
@@ -62,12 +63,18 @@ export default function PlayersProvider({
   }
   
   const handlePositionChange = (position: [number, number, number]) => {
+    /** USEFRAME AND STATE UPDATES ARE WONKY SO A SAFEGUARD FOR LOWERING THE AMOUNT OF POSITION CHANGE */
+    if ( prevChangedPosition && prevChangedPosition.toString() === position.toString() )
+      return;
+
+    prevChangedPosition = position;
+    
     if(!socket) return console.error("Socket is not initialized");
     
     // Get the corresponding player data with connectionId = socket.id
     const player = players.find(player => player.connectionId === socket.id);    
     if(!player) return;
-    
+
     handleUpdatePlayerData({
       ...player,
       position,

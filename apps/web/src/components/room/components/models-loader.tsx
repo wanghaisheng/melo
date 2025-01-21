@@ -3,75 +3,73 @@ import { Html, useGLTF } from "@react-three/drei";
 import Loader from "@/web/components/room/components/loader";
 import useGlobalStore from "@/web/store/global";
 
-export interface ModelsLoadConfiguration {
+type Vector3 = [number, number, number];
+
+interface ModelConfig {
   path: string;
   name: string;
   hideShadow?: boolean;
-
   props?: {
-    position?: [number,number,number],
-    rotation?: [number,number,number],
-    scale?: [number,number,number]
-  }
+    position?: Vector3;
+    rotation?: Vector3;
+    scale?: Vector3;
+  };
 }
 
-interface ModelsLoaderProps {
-  models: ModelsLoadConfiguration[]; 
-  disableLoader?: boolean;
-}
-
-function Model({
-  path,
-  hideShadow,
-  props,
-}: ModelsLoadConfiguration) {
+function Model({ path, hideShadow, props, onLoad }: ModelConfig & { onLoad: () => void }) {
   const { scene } = useGLTF(path);
   
-  // Enable shadows for all meshes in the scene
-  scene.traverse((child) => {
-    if ((child as any).isMesh && !hideShadow) {
-      child.castShadow = true;
-      child.receiveShadow = true;
-    }
-  });
-  
-  return <group {...props}>
-    <primitive object={scene} />
-  </group>;
-}
-
-// This component unloads when the model is loaded, and the fallback(this component) is unloaded.
-function ModelLoaderFallback({
-  handleIncreaseLoadCount,
-}: {
-  handleIncreaseLoadCount: () => void,
-}) {
-  
   useEffect(() => {
-    return () => {
-      handleIncreaseLoadCount();
-    }
-  }, [])
+    scene.traverse((child: any) => {
+      if (child.isMesh && !hideShadow) {
+        child.castShadow = true;
+        child.receiveShadow = true;
+      }
+    });
+    onLoad();
+  }, [scene, hideShadow]);
   
-  return <Html fullscreen>
-    <Loader progress={70} title="Models Loading..." subtitle={`The client is loading environments.`} />
-  </Html> ;
+  return <primitive object={scene} {...props} />;
 }
 
-export default function ModelsLoader({
-  models,
-  disableLoader = false,
-}: ModelsLoaderProps) {
+function LoadingFallback() {
+  return (
+    <Html fullscreen>
+      <Loader 
+        progress={70} 
+        title="Models Loading..." 
+        subtitle="The client is loading environments." 
+      />
+    </Html>
+  );
+}
+
+export default function ModelsLoader({ 
+  models, 
+  disableLoader = false 
+}: { 
+  models: ModelConfig[]; 
+  disableLoader?: boolean; 
+}) {
   const [loadCount, setLoadCount] = useState(0);
   const { setModelsLoading } = useGlobalStore();
 
   useEffect(() => {
-    if (disableLoader || loadCount >= models.length) setModelsLoading(false);
-  }, [disableLoader, loadCount]);
+    if (disableLoader || loadCount >= models.length) {
+      setModelsLoading(false);
+    }
+  }, [disableLoader, loadCount, models.length]);
 
-  return models.map((m, i) => {
-    return <Suspense key={i} fallback={disableLoader ? null : <ModelLoaderFallback handleIncreaseLoadCount={() => setLoadCount(c => c + 1)} />}>
-      <Model path={m.path} hideShadow={m.hideShadow ?? false} name={m.name} props={m.props}/>
+  return models.map(({ name, ...modelProps }) => (
+    <Suspense 
+      key={name} 
+      fallback={disableLoader ? null : <LoadingFallback />}
+    >
+      <Model 
+        {...modelProps} 
+        name={name}
+        onLoad={() => setLoadCount(c => c + 1)} 
+      />
     </Suspense>
-  })
+  ));
 }
