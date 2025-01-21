@@ -13,7 +13,7 @@ type VideoStreamProps = {
   hasAudio: boolean;
 };
 
-const VOLUME_MAX_DISTANCE_CAN_HEAR = 3; 
+const VOLUME_MAX_DISTANCE_CAN_HEAR = 2.5; 
 const VOLUME_DECAY_RATE = 1;
 
 export default function VideoStream({
@@ -42,6 +42,7 @@ export default function VideoStream({
     const volume = 1 / (1 + Math.exp(-VOLUME_DECAY_RATE * (VOLUME_MAX_DISTANCE_CAN_HEAR - distance)))
 
     videoRef.current.volume = volume;
+    if ( audioRef.current ) audioRef.current.volume = volume;
   }, [playerPosition, userPosition, isLocal, disableDynamicVolume]);
 
   useEffect(() => {
