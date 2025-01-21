@@ -1,10 +1,11 @@
 import { Html } from "@react-three/drei";
-import { useSpring, animated } from "@react-spring/three";
 import { useThree, useFrame } from "@react-three/fiber";
-import { useState } from "react";
+import { useRef, useState } from "react";
+import * as THREE from "three";
 
 import type { PlayerData } from "@melo/types";
 import VideoStream from "@/web/components/room/components/video-stream";
+import usePlayerStore from "@/web/store/players";
 
 interface PlayerProps {
   stream: MediaStream | null;
@@ -12,6 +13,8 @@ interface PlayerProps {
   player: PlayerData;
   userPosition: [number, number, number];
 }
+
+const PLAYER_MOVEMENT_SPEED = 4;
 
 export default function Player({
   stream,
@@ -22,21 +25,42 @@ export default function Player({
   const [size, setSize] = useState(2.5);
   const { camera } = useThree();
 
-  const { position } = useSpring({
-    position: player.position,
-    config: {
-      mass: 1,
-      tension: 170,
-      friction: 26
-    }
-  });
+  const meshRef = useRef<THREE.Mesh>(null);
+  const currentPosition = useRef(new THREE.Vector3(...player.position));
+  const targetPosition = useRef(new THREE.Vector3(...player.position));
 
+  if (!targetPosition.current.equals(new THREE.Vector3(...player.position))) {
+    targetPosition.current.set(...player.position);
+  }
+  
   const calculateSizeFromZoom = (zoom: number) => {
     return (1/35) * zoom - (1/14);
   };
 
-  // Update size every frame to respond to zoom changes
-  useFrame(() => {
+  useFrame((_, delta) => {
+    if ( meshRef.current ) {
+      const direction = new THREE.Vector3().subVectors(targetPosition.current, currentPosition.current);
+      const distance = direction.length();
+
+      if ( distance > 0.05 ) {
+        direction.normalize();
+        const movement = Math.min(PLAYER_MOVEMENT_SPEED * delta, distance);
+        currentPosition.current.add(direction.multiplyScalar(movement));
+        meshRef.current.position.copy(currentPosition.current);
+
+        if ( isLocal ) {
+          usePlayerStore.setState({
+            thisPlayerLiteralPosition: [
+              currentPosition.current.x,
+              currentPosition.current.y,
+              currentPosition.current.z,
+            ]
+          });
+        }
+      }
+    }    
+    
+    // Update size every frame to respond to zoom changes
     const newSize = calculateSizeFromZoom(camera.zoom);
     if (Math.abs(newSize - size) > 0.01) { // Only update if change is significant
       setSize(newSize);
@@ -45,13 +69,12 @@ export default function Player({
 
   return (
     //@ts-ignore
-    <animated.mesh 
+    <group 
+      ref={meshRef}
       key={player.connectionId}
       castShadow
-      position={position}
     >
       <Html 
-        position={[0,0,0]} 
         style={{
           pointerEvents: "none",
           transition: "all 0.1s ease-out", // Optional: smooth size changes
@@ -81,6 +104,6 @@ export default function Player({
         </div>
       </Html>
     {/* @ts-ignore */}
-    </animated.mesh>
+    </group>
   );
 }

@@ -27,12 +27,15 @@ export default function Level() {
               path: "/static/housing.glb",
               name: "Buildings",
               props: {
-                position: [0,0.5,0]
+                position: [0,0,0]
               }
             },
             {
               path: "/static/test.glb",
               name: "Environment",
+              props: {
+                position: [0,-1,0]
+              },
               hideShadow: true,
             }
           ]}
@@ -83,8 +86,6 @@ export default function Level() {
         {/* Subtle fill light */}
         <ambientLight intensity={0.4} />
         
-        <gridHelper />
-
         {/* Players */}
         <Players />
       </Canvas>
