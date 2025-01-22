@@ -1,5 +1,5 @@
 import { Canvas } from "@react-three/fiber";
-import { MapControls, OrthographicCamera } from "@react-three/drei";
+import { AdaptiveDpr, Bvh, MapControls, OrthographicCamera } from "@react-three/drei";
 
 import useGlobalStore from "@/web/store/global";
 
@@ -19,31 +19,35 @@ export default function Level() {
           outputColorSpace: 'srgb',
           antialias: false,
         }}
+        frameloop="always"
         >
-        {/* <Stats /> */}
-        <ModelsLoader 
-          models={[
-            {
-              path: "/static/housing.glb",
-              name: "Buildings",
-              props: {
-                position: [0,0,0]
-              }
-            },
-            {
-              path: "/static/test.glb",
-              name: "Environment",
-              props: {
-                position: [0,-1,0]
+        <AdaptiveDpr pixelated />
+        <Bvh firstHitOnly>
+          {/* <Stats /> */}
+          <ModelsLoader 
+            models={[
+              {
+                path: "/static/housing.glb",
+                name: "Buildings",
+                props: {
+                  position: [0,0,0]
+                }
               },
-              hideShadow: true,
-            }
-          ]}
-          // TODO: Be sure to remove this line in PROD
-          // disableLoader
-        />
+              {
+                path: "/static/test.glb",
+                name: "Environment",
+                props: {
+                  position: [0,-1,0]
+                },
+                hideShadow: true,
+              }
+            ]}
+            // TODO: Be sure to remove this line in PROD
+            // disableLoader
+          />
 
-        <Ground />
+          <Ground />
+        </Bvh>
 
         {/* Disable Map Controls while loading */}
         <MapControls 
@@ -54,7 +58,7 @@ export default function Level() {
           enablePan={!modelsLoading}
         />
 
-        <color attach="background" args={['#3B8B5D']} />
+        <color attach="background" args={['#000']} />
         <OrthographicCamera
           makeDefault
           zoom={100}

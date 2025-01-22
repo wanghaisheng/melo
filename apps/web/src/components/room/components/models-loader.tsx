@@ -1,5 +1,5 @@
 import { Suspense, useEffect, useState } from "react";
-import { Html, useGLTF } from "@react-three/drei";
+import { BakeShadows, Html, Preload, useGLTF } from "@react-three/drei";
 import Loader from "@/web/components/room/components/loader";
 import useGlobalStore from "@/web/store/global";
 
@@ -70,6 +70,8 @@ export default function ModelsLoader({
         name={name}
         onLoad={() => setLoadCount(c => c + 1)} 
       />
+      <BakeShadows />
+      <Preload all />
     </Suspense>
   ));
 }

@@ -87,11 +87,10 @@ function Ground() {
     if ( currentPosition.distanceToSquared(currentTargetPosition) < PLAYER_MOVEMENT_PATH_CHANGE_THRESHOLD_DIST * PLAYER_MOVEMENT_PATH_CHANGE_THRESHOLD_DIST) {
       // Remove the first element ( i.e current target and change target )
       path.current.shift();
+      if ( !path.current.length ) return;
+      handlePositionChange(path.current[0].toArray());
     }
     
-    if ( !(new THREE.Vector3(...currentPlayer!.position).equals(currentTargetPosition)) ){
-      handlePositionChange(currentTargetPosition.toArray());
-    }
   });
 
   // const handlePointerMove = () => {
@@ -154,6 +153,7 @@ function Ground() {
 
     if (foundPath && foundPath.length) {
       path.current = foundPath;
+      handlePositionChange(foundPath[0].toArray());
     }
   }
 
