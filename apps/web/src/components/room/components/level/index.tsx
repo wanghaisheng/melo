@@ -1,5 +1,5 @@
 import { Canvas } from "@react-three/fiber";
-import { AdaptiveDpr, Bvh, MapControls, OrthographicCamera } from "@react-three/drei";
+import { AdaptiveDpr, Bvh, MapControls, OrthographicCamera, Stars } from "@react-three/drei";
 
 import useGlobalStore from "@/web/store/global";
 
@@ -23,24 +23,17 @@ export default function Level() {
         >
         <AdaptiveDpr pixelated />
         <Bvh firstHitOnly>
+          <Stars depth={10} factor={1} count={10000} radius={30} saturation={100}/>
           {/* <Stats /> */}
           <ModelsLoader 
             models={[
               {
-                path: "/static/housing.glb",
+                path: "/static/level.glb",
                 name: "Buildings",
                 props: {
                   position: [0,0,0]
                 }
               },
-              {
-                path: "/static/test.glb",
-                name: "Environment",
-                props: {
-                  position: [0,-1,0]
-                },
-                hideShadow: true,
-              }
             ]}
             // TODO: Be sure to remove this line in PROD
             // disableLoader

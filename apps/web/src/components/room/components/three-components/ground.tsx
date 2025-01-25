@@ -158,14 +158,6 @@ function Ground() {
   }
 
   return <>
-    <mesh 
-      // onPointerLeave={() => setShowCursor(false)}
-      // onPointerMove={handlePointerMove}
-      position={[0,-2,0]}
-    >
-      <boxGeometry args={[100,2.35,100]} />
-      <meshStandardMaterial color="#3B8B5D" />
-    </mesh>
 
     {/* {
       showCursor && <Pointer 
