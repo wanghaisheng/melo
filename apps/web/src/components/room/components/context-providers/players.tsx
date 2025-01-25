@@ -80,7 +80,7 @@ export default function PlayersProvider({
       position,
     });
   }
-
+  
   const handleDisplayNameChange = (displayName: string) => {
     const player = getCurrentPlayer();
     if(!player) return;

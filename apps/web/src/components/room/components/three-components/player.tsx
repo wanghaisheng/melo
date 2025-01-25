@@ -5,7 +5,8 @@ import * as THREE from "three";
 
 import type { PlayerData } from "@melo/types";
 import VideoStream from "@/web/components/room/components/video-stream";
-import usePlayerStore from "@/web/store/players";
+// import usePlayerStore from "@/web/store/players";
+import useFrameStore from "@/web/store/frame";
 
 interface PlayerProps {
   stream: MediaStream | null;
@@ -55,7 +56,7 @@ export default function Player({
         meshRef.current.position.copy(currentPosition.current);
 
         if ( isLocal ) {
-          usePlayerStore.setState({
+          useFrameStore.setState({
             thisPlayerLiteralPosition: [
               currentPosition.current.x,
               currentPosition.current.y,

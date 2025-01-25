@@ -5,7 +5,7 @@ import { usePlayers } from "@/web/components/room/components/context-providers/p
 import * as THREE from "three";
 import { Pathfinding } from "three-pathfinding";
 import { useGLTF } from "@react-three/drei";
-import usePlayerStore from "@/web/store/players";
+import useFrameStore from "@/web/store/frame";
 
 const MOUSE_MOVE_THRESHOLD_DIST = 0.01;
 const PLAYER_MOVEMENT_PATH_CHANGE_THRESHOLD_DIST = 0.6;
@@ -82,7 +82,7 @@ function Ground() {
     if ( !path.current.length || !currentPlayer ) return;
 
     const currentTargetPosition = path.current[0];
-    const currentPosition = new THREE.Vector3(...usePlayerStore.getState().thisPlayerLiteralPosition);
+    const currentPosition = new THREE.Vector3(...useFrameStore.getState().thisPlayerLiteralPosition);
 
     if ( currentPosition.distanceToSquared(currentTargetPosition) < PLAYER_MOVEMENT_PATH_CHANGE_THRESHOLD_DIST * PLAYER_MOVEMENT_PATH_CHANGE_THRESHOLD_DIST) {
       // Remove the first element ( i.e current target and change target )
