@@ -42,6 +42,7 @@ export default function Level() {
           <Ground />
         </Bvh>
 
+
         {/* Disable Map Controls while loading */}
         <MapControls 
           enableRotate={false}
@@ -62,10 +63,10 @@ export default function Level() {
         
         <directionalLight 
           castShadow 
-          position={[10, 60, 0]} 
-          intensity={1}
-          shadow-intensity={2.6}
-          shadow-mapSize={[8192, 8192]}
+          position={[60, 60, -40]} 
+          intensity={2}
+          shadow-intensity={0.7}
+          shadow-mapSize={[24000, 24000]}
           shadow-camera-left={-100}
           shadow-camera-right={100}
           shadow-camera-top={100}
@@ -75,8 +76,8 @@ export default function Level() {
         
         {/* Hemisphere light for ambient illumination */}
         <hemisphereLight 
-          intensity={3}
-          groundColor="#000"
+          intensity={1.4}
+          groundColor="#555"
           position={[100, 100, 100]}
         />
         
