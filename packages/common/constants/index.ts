@@ -1,6 +1,8 @@
 export const WebSocketEvents = {
   // Room related
   EXISTING_USERS: "existing-users",
+  ZONE_TRANSFER_REQUEST: "zone-transfer-request",
+  ZONE_TRANSFER_RESPONSE: "zone-transfer-response",
 
   // For self
   USER_CONNECT: "user-connect",
@@ -21,3 +23,5 @@ export const WebSocketEvents = {
   // Stream related
   SET_STREAM_PROPERTIES: "set-stream-properties",
 }
+
+export const DEFAULT_ZONE_NAME = "lobby";

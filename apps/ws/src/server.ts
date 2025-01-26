@@ -1,9 +1,9 @@
 import type * as Party from "partykit/server";
 
 import BasePartyServer from "@/ws/core/server-base";
-import { WebSocketEvents } from "@melo/common/constants";
+import { DEFAULT_ZONE_NAME, WebSocketEvents } from "@melo/common/constants";
 
-import type { PlayerData } from "@melo/types";
+import type { PlayerData, ZoneTransferRequest, ZoneTransferResponse } from "@melo/types";
 
 export default class Server extends BasePartyServer implements Party.Server {
   private users = new Map<string, PlayerData>();
@@ -49,6 +49,7 @@ export default class Server extends BasePartyServer implements Party.Server {
           video: false,
           audio: false,
           streamStatus: "configure",
+          zone: DEFAULT_ZONE_NAME,
         })
       }
 
@@ -72,6 +73,38 @@ export default class Server extends BasePartyServer implements Party.Server {
     })
     /** USER DIS-CONNECTION HANDLER */
     
+    /** ZONE(Room) TRANSFER */
+    this.on(WebSocketEvents.ZONE_TRANSFER_REQUEST, (data, conn) => {
+      const knockRequest = data.request as ZoneTransferRequest;
+      
+      const playerIdsOfRequestedRoom = [];
+
+      for ( const [id, player] of this.users.entries() ) {
+        if ( player.zone === knockRequest.zone.to ) {
+          playerIdsOfRequestedRoom.push(id);
+        }
+      }
+      
+      this.emitTo(WebSocketEvents.ZONE_TRANSFER_REQUEST, data, playerIdsOfRequestedRoom)
+    });
+
+    this.on(WebSocketEvents.ZONE_TRANSFER_RESPONSE, (data, conn) => {
+      const response = data.response as ZoneTransferResponse;
+
+      // Get the conn.id of the user who requested the transfer
+      const requestUserId = this.users.get(response.requestUser)?.connectionId;
+      if (!requestUserId) return console.error(`User with id ${response.requestUser} not found`);
+
+      // Get the conn.ids of the users in the room that is being requested into
+      const playerIdsOfRequestedRoom = [];
+      for ( const [id, player] of this.users.entries() ) {
+        if ( player.zone === response.transferRequest.zone.to ) {
+          playerIdsOfRequestedRoom.push(id);
+        }
+      }
+
+      this.emitTo(WebSocketEvents.ZONE_TRANSFER_RESPONSE, data, [requestUserId, ...playerIdsOfRequestedRoom]);
+    });
     
     this.on(WebSocketEvents.P2P_OFFER, (data, conn) => {
       // Offer by broadcasting to the specific user only
