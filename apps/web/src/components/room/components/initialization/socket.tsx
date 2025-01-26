@@ -27,6 +27,7 @@ export default function SocketConnection({ children, room } : SocketConnectionPr
       // "Connect" with the socket
       socket.emit(WebSocketEvents.USER_CONNECT, {
         auth_uid: auth.user!.uid,
+        username: auth.user!.displayName,
       });
     });
   }, [addSocketConnectCallbacks, auth, room, setSocket]);

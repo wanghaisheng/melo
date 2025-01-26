@@ -30,8 +30,10 @@ export default class Server extends BasePartyServer implements Party.Server {
     this.on(WebSocketEvents.USER_CONNECT, (data, sender) => {
       const {
         auth_uid,
+        username,
       }: {
         auth_uid: string,
+        username: string,
       } = data;
       
         // Assign position
@@ -40,8 +42,8 @@ export default class Server extends BasePartyServer implements Party.Server {
         this.users.set(sender.id, {
           auth_uid,
           connectionId: sender.id,
-          username: "User" + Math.floor(Math.random() * 1000),
-          displayName: "User" + Math.floor(Math.random() * 1000),
+          username: username,
+          displayName: username,
           position: [0,0,0],
           rotation: [0,0,0],
           video: false,

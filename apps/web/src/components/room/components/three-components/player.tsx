@@ -7,6 +7,7 @@ import type { PlayerData } from "@melo/types";
 import VideoStream from "@/web/components/room/components/video-stream";
 // import usePlayerStore from "@/web/store/players";
 import useFrameStore from "@/web/store/frame";
+import { Mic } from "lucide-react";
 
 interface PlayerProps {
   stream: MediaStream | null;
@@ -96,9 +97,39 @@ export default function Player({
           className={`
               -z-10 -translate-x-1/2 -translate-y-[100%] 
               border-2 ${isLocal ? "border-pink-400" : "border-white"} 
-              rounded-xl 
+              rounded-xl flex flex-col items-center
               `}
         >
+          {
+            size > 3 && (
+              <span 
+                style={{
+                  fontSize: `${size/5}rem`
+                }}
+                className="absolute z-10 font-semibold text-white -top-5 w-[300%] text-center">Saphal Poudyal</span>
+            )
+          }
+          {
+            size > 3 ? (
+            <div 
+              className="absolute bottom-1 right-1 z-10">
+                {
+                  player.audio && (
+                    <Mic className="text-rose-400" size={size * 4} absoluteStrokeWidth />
+                  )
+                }
+            </div>
+            ) : (
+            <div 
+              className="absolute -bottom-1 -right-1 z-10">
+                {
+                  player.audio && (
+                    <Mic className="text-white" size={13} absoluteStrokeWidth />
+                  )
+                }
+            </div>
+            )
+          }
           <VideoStream 
             stream={stream} 
             isLocal={isLocal} 
