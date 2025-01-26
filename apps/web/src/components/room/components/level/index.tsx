@@ -17,7 +17,7 @@ export default function Level() {
         gl={{ 
           toneMapping: 3, // ACESFilmicToneMapping
           outputColorSpace: 'srgb',
-          antialias: false,
+          antialias: true,
         }}
         frameloop="always"
         >
