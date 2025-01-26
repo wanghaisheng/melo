@@ -47,7 +47,7 @@ export default function Level() {
         <MapControls 
           enableRotate={false}
           minZoom={50}
-          maxZoom={100}
+          maxZoom={140}
           zoomSpeed={3}
           enablePan={!modelsLoading}
         />
@@ -63,6 +63,7 @@ export default function Level() {
         
         <directionalLight 
           castShadow 
+          color={"#ddf"}
           position={[60, 60, -40]} 
           intensity={2}
           shadow-intensity={0.7}

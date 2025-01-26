@@ -25,16 +25,7 @@ function Model({ path, hideShadow, props, onLoad }: ModelConfig & { onLoad: () =
     scene.traverse((child: any) => {
 
       if ( child.name.startsWith('Lights_') ) {
-        // const light = new THREE.PointLight("#ff0", 1, 10);
-        console.log(child);
-        // Get the child's height and width to put in rect area light
-        const box = new THREE.Box3().setFromObject(child);
-        const size = new THREE.Vector3();
-        box.getSize(size);
-        
-        console.log(size);
-        
-        const light = new THREE.RectAreaLight("#0f0", 20, size.x, size.z);
+        const light = new THREE.PointLight("#ffb", .4, 0.85, 30);
         // Update the matrix world to the child's matrix world to get all transforms
         child.updateMatrixWorld();
         light.position.setFromMatrixPosition(child.matrixWorld);
