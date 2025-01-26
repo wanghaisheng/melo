@@ -50,6 +50,7 @@ export default function Level() {
           maxZoom={140}
           zoomSpeed={3}
           enablePan={!modelsLoading}
+          dampingFactor={0.3}
         />
 
         <color attach="background" args={['#000']} />

@@ -19,7 +19,7 @@ interface ModelConfig {
 }
 
 function Model({ path, hideShadow, props, onLoad }: ModelConfig & { onLoad: () => void }) {
-  const { scene } = useGLTF(path);
+  const { scene } = useGLTF(path, "https://www.gstatic.com/draco/versioned/decoders/1.3.6/");
   
   useEffect(() => {
     scene.traverse((child: any) => {
@@ -38,6 +38,8 @@ function Model({ path, hideShadow, props, onLoad }: ModelConfig & { onLoad: () =
       }
       
       if (child.isMesh && !hideShadow) {
+        (child as THREE.Object3D).matrixAutoUpdate = false;
+        (child as THREE.Object3D).matrixWorldAutoUpdate = false;
         child.castShadow = true;
         child.receiveShadow = true;
       }
