@@ -1,9 +1,12 @@
 import Loader from "@/web/components/room/components/loader";
 import useGlobalStore from "@/web/store/global";
 import usePlayerStore from "@/web/store/players";
+import useSceneStore from "@/web/store/scene";
 import { WebSocketEvents } from "@melo/common/constants";
 import type { PlayerData } from "@melo/types";
 import React, { createContext, useContext, useEffect, useState } from "react";
+
+import * as THREE from "three";
 
 const playersContext = createContext<PlayersContext | null>(null);
 
@@ -27,6 +30,7 @@ export default function PlayersProvider({
     setPlayers,
     players,
   } = usePlayerStore();
+  const { transferZones } = useSceneStore();
   const { socket } = useGlobalStore();
   const [ loading, setLoading ] = useState(true);
   
@@ -70,11 +74,30 @@ export default function PlayersProvider({
     prevChangedPosition = position;
     
     if(!socket) return console.error("Socket is not initialized");
-    
+
     // Get the corresponding player data with connectionId = socket.id
     const player = players.find(player => player.connectionId === socket.id);    
     if(!player) return;
 
+    // Ping position change to zone transfer
+    // WHY here? : Calculating intersection here is very cheap as compared
+    // to doing it in the transfer zone component or the frame loop.
+    let intersectedZone = null;
+    for ( const zone of transferZones ) {
+      const boundingBox = new THREE.Box3().setFromObject(zone);
+
+      if ( boundingBox.containsPoint( new THREE.Vector3(...position) ) ) {
+        intersectedZone = zone;
+        break;
+      }
+    }
+
+    console.log("INSERTECTED ZONE", intersectedZone);
+    
+    useSceneStore.setState({
+      playerCurrentTransferZone: intersectedZone,
+    });
+    
     handleUpdatePlayerData({
       ...player,
       position,

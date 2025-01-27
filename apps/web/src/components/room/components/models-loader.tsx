@@ -30,10 +30,12 @@ function Model({ path, hideShadow, props, onLoad }: ModelConfig & { onLoad: () =
     scene.traverse((child: any) => {
       if ( child.name.startsWith('Lights_') ) {
         lights.push(child);
+        return;
       }
 
       if ( child.name.startsWith("Door_") ) {
         transferZones.push(child);
+        return;
       }
       
       if (child.isMesh && !hideShadow) {
@@ -60,17 +62,8 @@ function Model({ path, hideShadow, props, onLoad }: ModelConfig & { onLoad: () =
       scene.remove(child);
     });
 
-    // transferZones.forEach(child => {
-    //   const door = new THREE.Mesh(
-    //     new THREE.BoxGeometry(child.scale.x * 2, child.scale.y * 2, child.scale.z * 2),
-    //     new THREE.MeshStandardMaterial({ color: "#f00" })
-    //   );
-    //   door.position.setFromMatrixPosition(child.matrixWorld);
-    //   door.rotation.setFromRotationMatrix(child.matrixWorld);
-    //   scene.add(door);
-
-    //   scene.remove(child);
-    // });
+    
+    transferZones.forEach(child => scene.remove(child));
     
     onLoad();
   }, [scene, hideShadow]);
