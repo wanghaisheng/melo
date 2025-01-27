@@ -4,6 +4,7 @@ import Loader from "@/web/components/room/components/loader";
 import useGlobalStore from "@/web/store/global";
 
 import * as THREE from "three";
+import useSceneStore from "@/web/store/scene";
 
 type Vector3 = [number, number, number];
 
@@ -20,21 +21,19 @@ interface ModelConfig {
 
 function Model({ path, hideShadow, props, onLoad }: ModelConfig & { onLoad: () => void }) {
   const { scene } = useGLTF(path, "https://www.gstatic.com/draco/versioned/decoders/1.3.6/");
+  const { setLights, setTransferZones } = useSceneStore();
   
   useEffect(() => {
+    const lights: THREE.Object3D[] = [];
+    const transferZones: THREE.Object3D[] = []; // Doors = Transfer Zones
+    
     scene.traverse((child: any) => {
-
       if ( child.name.startsWith('Lights_') ) {
-        const light = new THREE.PointLight("#ffb", .4, 0.85, 30);
-        // Update the matrix world to the child's matrix world to get all transforms
-        child.updateMatrixWorld();
-        light.position.setFromMatrixPosition(child.matrixWorld);
-        light.rotation.setFromRotationMatrix(child.matrixWorld);
+        lights.push(child);
+      }
 
-        // light.position.copy(child.position);
-        light.rotation.copy(child.rotation);
-        scene.add(light);
-        // scene.remove(child);
+      if ( child.name.startsWith("Door_") ) {
+        transferZones.push(child);
       }
       
       if (child.isMesh && !hideShadow) {
@@ -44,6 +43,35 @@ function Model({ path, hideShadow, props, onLoad }: ModelConfig & { onLoad: () =
         child.receiveShadow = true;
       }
     });
+
+    setLights(lights);
+    setTransferZones(transferZones);
+    
+    lights.forEach(child => {
+      const light = new THREE.PointLight("#ffb", .4, 0.85, 30);
+      // Update the matrix world to the child's matrix world to get all transforms
+      child.updateMatrixWorld();
+      light.position.setFromMatrixPosition(child.matrixWorld);
+      light.rotation.setFromRotationMatrix(child.matrixWorld);
+
+      light.rotation.copy(child.rotation);
+      scene.add(light);
+      
+      scene.remove(child);
+    });
+
+    // transferZones.forEach(child => {
+    //   const door = new THREE.Mesh(
+    //     new THREE.BoxGeometry(child.scale.x * 2, child.scale.y * 2, child.scale.z * 2),
+    //     new THREE.MeshStandardMaterial({ color: "#f00" })
+    //   );
+    //   door.position.setFromMatrixPosition(child.matrixWorld);
+    //   door.rotation.setFromRotationMatrix(child.matrixWorld);
+    //   scene.add(door);
+
+    //   scene.remove(child);
+    // });
+    
     onLoad();
   }, [scene, hideShadow]);
   
