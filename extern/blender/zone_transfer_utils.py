@@ -77,6 +77,7 @@ def replace_zone_target_prop_with_target_position():
                     obj["target_pos_x"] = target_position.x
                     obj["target_pos_y"] = target_position.y
                     obj["target_pos_z"] = target_position.z
+                    obj["target_zone_name"] = target_obj["zone_name"]
                 else:
                     print(
                         f"Warning: target_pos for {obj.name} is not an object reference"
