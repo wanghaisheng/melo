@@ -45,7 +45,6 @@ export default function PlayersProvider({
       const players = Object.values(data as Record<string, PlayerData>);
       setPlayers(players);
     });
-
     // Artificially create a very small delay to show loading realistically
     new Promise((r,_) => setTimeout(r, 300)).then(() => setLoading(false));
   }, [setPlayers, socket]);
@@ -81,7 +80,7 @@ export default function PlayersProvider({
 
     // Ping position change to zone transfer
     // WHY here? : Calculating intersection here is very cheap as compared
-    // to doing it in the transfer zone component or the frame loop.
+    // to doing it in the transfer zone component or the frame loop.\
     let intersectedZone = null;
     for ( const zone of transferZones ) {
       const boundingBox = new THREE.Box3().setFromObject(zone);

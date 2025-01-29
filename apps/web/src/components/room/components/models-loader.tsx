@@ -63,6 +63,7 @@ function Model({ path, hideShadow, props, onLoad }: ModelConfig & { onLoad: () =
     });
 
     
+    lights.forEach(child => scene.remove(child));
     transferZones.forEach(child => scene.remove(child));
     
     onLoad();

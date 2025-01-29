@@ -32,10 +32,21 @@ export type FirestoreRoom = {
   members: string[];
 }
 
+export type ZoneTransferObjectProps = {
+  is_to_public: boolean;
+  name: string;
+  target_pos_x: number;
+  target_pos_y: number;
+  target_pos_z: number;
+  target_zone_name: string;
+  zone_name: string;
+}
+
 // Knock Request
 export type ZoneTransferRequest = {
   requestId: string;
   timestamp: number;
+  goToPublic: boolean;
   zone: {
     from: string;
     to: string;

@@ -4,6 +4,7 @@ import BasePartyServer from "@/ws/core/server-base";
 import { DEFAULT_ZONE_NAME, WebSocketEvents } from "@melo/common/constants";
 
 import type { PlayerData, ZoneTransferRequest, ZoneTransferResponse } from "@melo/types";
+import { v4 as uuidv4 } from "uuid";
 
 export default class Server extends BasePartyServer implements Party.Server {
   private users = new Map<string, PlayerData>();
@@ -83,6 +84,22 @@ export default class Server extends BasePartyServer implements Party.Server {
         if ( player.zone === knockRequest.zone.to ) {
           playerIdsOfRequestedRoom.push(id);
         }
+      }
+
+      if ( playerIdsOfRequestedRoom.length === 0 || knockRequest.goToPublic ) {
+        // Accept the request by system instead of user
+        
+        this.emitTo(WebSocketEvents.ZONE_TRANSFER_RESPONSE, {
+          response : {
+            transferRequest: knockRequest,
+            requestUser: conn.id,
+            isAccept: true,
+            responseId: uuidv4(),
+            responseUser: "system",
+            timestamp: Date.now(),
+          } as ZoneTransferResponse
+        }, [conn.id]);
+        return;
       }
       
       this.emitTo(WebSocketEvents.ZONE_TRANSFER_REQUEST, data, playerIdsOfRequestedRoom)

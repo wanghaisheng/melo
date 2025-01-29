@@ -6,11 +6,11 @@
     "deploy": "partykit deploy"
   },
   "dependencies": {
-    "partysocket": "^1.0.2",
-    "@melo/types": "workspace:^",
     "@melo/common": "workspace:^",
-    "@melo/ts-config": "workspace:*"
-
+    "@melo/ts-config": "workspace:*",
+    "@melo/types": "workspace:^",
+    "partysocket": "^1.0.2",
+    "uuid": "^11.0.5"
   },
   "devDependencies": {
     "partykit": "^0.0.110",

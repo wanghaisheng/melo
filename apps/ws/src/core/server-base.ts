@@ -30,7 +30,7 @@ export default class BasePartyServer implements Party.Server {
   protected emitTo(eventType: string,msg: object, to?: string[]) {
     // Custom class to imitate socket.io emit function
     // WHY ? : Because I like it
-    if (to === null || to === undefined || to.length === 0) {
+    if (to === null || to === undefined) {
       // Broadcast to all
       this.room.broadcast(JSON.stringify({
         type: eventType,
@@ -62,7 +62,7 @@ export default class BasePartyServer implements Party.Server {
     }), ignoreIds);
   }
 
-  protected emitWithout(eventType: string,msg: object, without?: string[]) {
+  protected emitWithout(eventType: string, msg: object, without?: string[]) {
     // Basically wrapper for this.room.broadcast
     this.room.broadcast(JSON.stringify({
       type: eventType,
