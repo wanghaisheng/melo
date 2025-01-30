@@ -10,6 +10,7 @@ import VideoSection from "@/web/components/room/components/user/video-section";
 import Controls from "@/web/components/room/components/user/controls";
 import { useAuthStore } from "@/web/store/auth";
 import UserCard from "@/web/components/dashboard/sidebar/user-card";
+import TransferZoneControls from "@/web/components/room/components/user/transfer-zone-controls";
 
 export default function Room({
   roomId,
@@ -31,6 +32,7 @@ export default function Room({
             <PlayersProvider>
               <ConnectSocket>
                 <Controls />
+                <TransferZoneControls />
                 <VideoSection />
                 <ChatLogs />
                 <Level />

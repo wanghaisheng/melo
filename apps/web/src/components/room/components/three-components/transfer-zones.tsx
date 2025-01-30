@@ -3,11 +3,12 @@ import { useAuthStore } from "@/web/store/auth";
 import useGlobalStore from "@/web/store/global";
 import usePlayerStore from "@/web/store/players";
 import useSceneStore from "@/web/store/scene";
-import { WebSocketEvents } from "@melo/common/constants";
+import { DEFAULT_MAX_ZOOM, DEFAULT_MIN_ZOOM, WebSocketEvents } from "@melo/common/constants";
 import type { ZoneTransferObjectProps, ZoneTransferRequest, ZoneTransferResponse } from "@melo/types";
 import { Button } from "@melo/ui/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@melo/ui/ui/tooltip";
 import { Html } from "@react-three/drei";
+import { useThree } from "@react-three/fiber";
 import { DoorClosed, DoorOpen } from "lucide-react";
 import { useEffect } from "react";
 import { type Object3D } from "three";
@@ -24,11 +25,9 @@ export default function TransferZones() {
   const { handleZoneAndPositionChange } = usePlayers();
   const { players } = usePlayerStore();
 
+  const { camera } = useThree();
+
   useEffect(() => {
-    // socket?.on(WebSocketEvents.ZONE_TRANSFER_REQUEST, (data: any) => {
-    //   // const transferRequest = data.request as ZoneTransferRequest;
-      
-    // });
     if ( socket?.isRegistered(WebSocketEvents.ZONE_TRANSFER_RESPONSE) ) return;
     
     socket?.on(WebSocketEvents.ZONE_TRANSFER_RESPONSE, (data: any) => {
@@ -82,7 +81,7 @@ export default function TransferZones() {
     >
       <Html>
         {
-          isIntersecting && (
+          isIntersecting && camera.zoom > ((DEFAULT_MIN_ZOOM + DEFAULT_MAX_ZOOM)/ 2) && (
             <span className="absolute -left-[32px] w-[80px] h-[48px] rounded-lg -translate-x-1/2 -top-12">
               <TooltipProvider>
                 <Tooltip>

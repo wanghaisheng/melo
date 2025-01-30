@@ -7,6 +7,7 @@ import Players from "@/web/components/room/components/three-components/players";
 import ModelsLoader from "@/web/components/room/components/models-loader";
 import Ground from "@/web/components/room/components/three-components/ground";
 import TransferZones from "@/web/components/room/components/three-components/transfer-zones";
+import { DEFAULT_MAX_ZOOM, DEFAULT_MIN_ZOOM } from "@melo/common/constants";
 
 export default function Level() {
   const { modelsLoading } = useGlobalStore();
@@ -47,8 +48,8 @@ export default function Level() {
         {/* Disable Map Controls while loading */}
         <MapControls 
           enableRotate={false}
-          minZoom={50}
-          maxZoom={140}
+          minZoom={DEFAULT_MIN_ZOOM}
+          maxZoom={DEFAULT_MAX_ZOOM}
           zoomSpeed={3}
           enablePan={!modelsLoading}
           dampingFactor={0.3}
