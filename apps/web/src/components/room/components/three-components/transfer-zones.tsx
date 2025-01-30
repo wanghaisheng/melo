@@ -29,14 +29,12 @@ export default function TransferZones() {
     
     socket?.on(WebSocketEvents.ZONE_TRANSFER_RESPONSE, (data: any) => {
       const response = data.response as ZoneTransferResponse;
-      const playerCurrentTransferZone = useSceneStore.getState().playerCurrentTransferZone;
-      const zoneProps = playerCurrentTransferZone?.userData as ZoneTransferObjectProps | null;
 
-      if ( !playerCurrentTransferZone || !zoneProps || zoneProps.zone_identifier !== response.transferRequest.zoneIdentifier.from) {
-        return console.error("ERROR: Force zone teleport hasn't been implemented yet");
-      }
+      const fromZoneProps = useSceneStore.getState().transferZones.find(zone => zone.userData.zone_identifier === response.transferRequest.zoneIdentifier.from)?.userData as ZoneTransferObjectProps | null;
 
-      handleZoneAndPositionChange(response.transferRequest.zone.to, [zoneProps.target_pos_x, zoneProps.target_pos_z, -zoneProps.target_pos_y]);
+      if (!fromZoneProps) return console.error("ERROR: Zone props not found");
+
+      handleZoneAndPositionChange(response.transferRequest.zone.to, [fromZoneProps.target_pos_x, fromZoneProps.target_pos_z, -fromZoneProps.target_pos_y]);  
     });
   }, []);
   
