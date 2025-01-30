@@ -18,7 +18,7 @@ export default function TransferZones() {
   const { socket } = useGlobalStore();
   const { auth } = useAuthStore();
   const { transferZones, playerCurrentTransferZone } = useSceneStore();
-  const { handlePositionChange } = usePlayers();
+  const { handleZoneAndPositionChange } = usePlayers();
 
   useEffect(() => {
     // socket?.on(WebSocketEvents.ZONE_TRANSFER_REQUEST, (data: any) => {
@@ -32,11 +32,11 @@ export default function TransferZones() {
       const playerCurrentTransferZone = useSceneStore.getState().playerCurrentTransferZone;
       const zoneProps = playerCurrentTransferZone?.userData as ZoneTransferObjectProps | null;
 
-      if ( !playerCurrentTransferZone || !zoneProps || zoneProps.zone_identifier !== response.transferRequest.zone.from) {
+      if ( !playerCurrentTransferZone || !zoneProps || zoneProps.zone_identifier !== response.transferRequest.zoneIdentifier.from) {
         return console.error("ERROR: Force zone teleport hasn't been implemented yet");
       }
 
-      handlePositionChange([zoneProps.target_pos_x, zoneProps.target_pos_z, -zoneProps.target_pos_y]);
+      handleZoneAndPositionChange(response.transferRequest.zone.to, [zoneProps.target_pos_x, zoneProps.target_pos_z, -zoneProps.target_pos_y]);
     });
   }, []);
   
@@ -51,9 +51,13 @@ export default function TransferZones() {
         requestFrom:auth.user.uid,
         requestId: uuidv4(),
         timestamp: Date.now(),
-        zone: {
+        zoneIdentifier: {
           from: transferZone.userData.zone_identifier,
           to: transferZoneProps.target_zone_identifier,
+        },
+        zone: {
+          from: transferZoneProps.zone_name,
+          to: transferZoneProps.target_zone_name,
         },
         goToPublic: transferZoneProps.is_to_public,
       } satisfies ZoneTransferRequest
@@ -73,7 +77,10 @@ export default function TransferZones() {
         {
           isIntersecting && (
             <span className="absolute -top-32 w-20 h-12 rounded-lg -translate-x-1/2">
-              <Button onClick={() => handleKnock(isIntersecting, placeholder)} variant="secondary">
+              <Button onClick={(e) => {
+                e.stopPropagation();
+                handleKnock(isIntersecting, placeholder);
+              }} variant="secondary">
                 Knock
               </Button>
             </span>

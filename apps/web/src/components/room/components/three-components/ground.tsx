@@ -58,7 +58,6 @@ function Ground() {
 
     navMeshScene.traverse(o => {
       if ( o.type === "Mesh" && o.name.startsWith(NAVMESH_MESH_NAME_PREFIX) ) {
-        console.log("Found navmesh", o.name);
         const geom = (o as THREE.Mesh).geometry.clone();
         geom.name = o.name.split(NAVMESH_MESH_NAME_PREFIX)[1];
         

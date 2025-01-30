@@ -49,10 +49,14 @@ export type ZoneTransferRequest = {
   requestId: string;
   timestamp: number;
   goToPublic: boolean;
+  zoneIdentifier: {
+    from: string;
+    to: string;
+  };
   zone: {
     from: string;
     to: string;
-  },
+  };
   requestFrom: string;
 }
 

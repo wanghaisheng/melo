@@ -19,6 +19,8 @@ interface PlayersContext {
   getCurrentPlayer(): PlayerData | void;
   handlePositionChange(position: [number, number, number]): void;
   handleDisplayNameChange(displayName: string): void;
+  handleZoneChange(zone: string): void;
+  handleZoneAndPositionChange(zone: string, position: [number, number, number]): void;
 }
 
 let prevChangedPosition: [number,number,number] | null = null;
@@ -65,7 +67,20 @@ export default function PlayersProvider({
     return player;
   }
   
-  const handlePositionChange = (position: [number, number, number]) => {
+  const handleZoneChange = (zone: string) => {
+    if(!socket) return console.error("Socket is not initialized");
+
+    const player = players.find(player => player.connectionId === socket.id);
+    if(!player) return console.error("Current player not found");
+
+    handleUpdatePlayerData({
+      ...player,
+      zone,
+    });
+  }
+  
+  // PRIVATE
+  const handlePositionChangeAndOther = (position: [number, number, number], data: Partial<PlayerData>) => {
     /** USEFRAME AND STATE UPDATES ARE WONKY SO A SAFEGUARD FOR LOWERING THE AMOUNT OF POSITION CHANGE */
     if ( prevChangedPosition && prevChangedPosition.toString() === position.toString() )
       return;
@@ -91,16 +106,23 @@ export default function PlayersProvider({
       }
     }
 
-    console.log("INSERTECTED ZONE", intersectedZone);
-    
     useSceneStore.setState({
       playerCurrentTransferZone: intersectedZone,
     });
     
     handleUpdatePlayerData({
       ...player,
+      ...data,
       position,
     });
+  }
+  
+  const handlePositionChange = (position: [number, number, number]) => {
+    handlePositionChangeAndOther(position, {});
+  }
+
+  const handleZoneAndPositionChange = (zone: string, position: [number, number, number]) => {
+    handlePositionChangeAndOther(position, { zone });
   }
   
   const handleDisplayNameChange = (displayName: string) => {
@@ -113,7 +135,6 @@ export default function PlayersProvider({
     });
   }
 
-  // if ( loading ) return <div>Players Loading...</div>
   if ( loading ) return <Loader title="Players Loading..." subtitle="The server is managing players connection." progress={40}/>
   
   return <playersContext.Provider value={{
@@ -121,6 +142,8 @@ export default function PlayersProvider({
     getCurrentPlayer,
     handlePositionChange,
     handleDisplayNameChange,
+    handleZoneChange,
+    handleZoneAndPositionChange,
   }}>
     { children }
   </playersContext.Provider>

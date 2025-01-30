@@ -115,7 +115,7 @@ export default class Server extends BasePartyServer implements Party.Server {
       // Get the conn.ids of the users in the room that is being requested into
       const playerIdsOfRequestedRoom = [];
       for ( const [id, player] of this.users.entries() ) {
-        if ( player.zone === response.transferRequest.zone.to ) {
+        if ( player.zone === response.transferRequest.zoneIdentifier.to ) {
           playerIdsOfRequestedRoom.push(id);
         }
       }
