@@ -32,7 +32,7 @@ export default function TransferZones() {
       const playerCurrentTransferZone = useSceneStore.getState().playerCurrentTransferZone;
       const zoneProps = playerCurrentTransferZone?.userData as ZoneTransferObjectProps | null;
 
-      if ( !playerCurrentTransferZone || !zoneProps || zoneProps.zone_name !== response.transferRequest.zone.from) {
+      if ( !playerCurrentTransferZone || !zoneProps || zoneProps.zone_identifier !== response.transferRequest.zone.from) {
         return console.error("ERROR: Force zone teleport hasn't been implemented yet");
       }
 
@@ -52,8 +52,8 @@ export default function TransferZones() {
         requestId: uuidv4(),
         timestamp: Date.now(),
         zone: {
-          from: transferZone.userData.zone_name,
-          to: transferZoneProps.target_zone_name,
+          from: transferZone.userData.zone_identifier,
+          to: transferZoneProps.target_zone_identifier,
         },
         goToPublic: transferZoneProps.is_to_public,
       } satisfies ZoneTransferRequest
@@ -62,10 +62,10 @@ export default function TransferZones() {
   
   // TODO: Delete the transfer zone's original placeholder child
   return transferZones.map(placeholder => {
-    const isIntersecting = playerCurrentTransferZone?.userData.zone_name === placeholder.userData.zone_name;
+    const isIntersecting = playerCurrentTransferZone?.userData.zone_identifier === placeholder.userData.zone_identifier;
 
     return <mesh
-      key={placeholder.uuid}
+      key={placeholder.userData.zone_identifier}
       position={placeholder.position}
       rotation={placeholder.rotation}
     >

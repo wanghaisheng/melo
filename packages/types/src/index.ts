@@ -40,6 +40,8 @@ export type ZoneTransferObjectProps = {
   target_pos_z: number;
   target_zone_name: string;
   zone_name: string;
+  zone_identifier: string;
+  target_zone_identifier: string;
 }
 
 // Knock Request
