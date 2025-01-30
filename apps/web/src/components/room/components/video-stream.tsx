@@ -85,12 +85,11 @@ export default function VideoStream({
       )}
 
       {
-        hasAudio && (
+        hasAudio && !isLocal && (
           <audio
             ref={audioRef}
             autoPlay
             playsInline
-            muted={isLocal}
           />
         )
       }

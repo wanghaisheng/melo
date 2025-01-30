@@ -14,6 +14,7 @@ interface PlayerProps {
   isLocal: boolean;
   player: PlayerData;
   userPosition: [number, number, number];
+  userZone: string;
 }
 
 const PLAYER_MOVEMENT_SPEED = 4;
@@ -23,6 +24,7 @@ export default function Player({
   player,
   isLocal,
   userPosition,
+  userZone,
 }: PlayerProps) {
   const [size, setSize] = useState(2.5);
   const { camera } = useThree();
@@ -137,7 +139,7 @@ export default function Player({
             userPosition={userPosition}
             playerPosition={player.position}
             hasVideo={player.video}
-            hasAudio={player.audio}
+            hasAudio={player.audio && userZone === player.zone}
           />
         </div>
       </Html>

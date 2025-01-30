@@ -25,6 +25,7 @@ export default function Players() {
       isLocal={player.connectionId === socket?.id}
       player={player}
       userPosition={currentPlayer.position}
+      userZone={currentPlayer.zone}
     />
   ));
 }

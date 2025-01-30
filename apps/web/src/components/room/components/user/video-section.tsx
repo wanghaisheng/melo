@@ -54,7 +54,7 @@ export default function VideoSection() {
             playerPosition={player.position}
             userPosition={thisPlayer.position}
             hasVideo={player.video}
-            hasAudio={player.audio}
+            hasAudio={player.audio && player.zone === thisPlayer.zone}
             disableDynamicVolume
           />
           <div className="absolute bottom-1 left-1 text-white text-sm bg-black/50 px-2 py-1 rounded">
