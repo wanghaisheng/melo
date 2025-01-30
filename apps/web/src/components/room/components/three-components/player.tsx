@@ -106,7 +106,7 @@ export default function Player({
                 style={{
                   fontSize: `${size/5}rem`
                 }}
-                className="absolute z-10 font-semibold text-white -top-5 w-[300%] text-center">Saphal Poudyal</span>
+                className="absolute z-10 font-semibold text-white -top-5 w-[300%] text-center">{player.username}</span>
             )
           }
           {
