@@ -1,11 +1,14 @@
 import { usePlayers } from "@/web/components/room/components/context-providers/players";
 import { useAuthStore } from "@/web/store/auth";
 import useGlobalStore from "@/web/store/global";
+import usePlayerStore from "@/web/store/players";
 import useSceneStore from "@/web/store/scene";
 import { WebSocketEvents } from "@melo/common/constants";
 import type { ZoneTransferObjectProps, ZoneTransferRequest, ZoneTransferResponse } from "@melo/types";
 import { Button } from "@melo/ui/ui/button";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@melo/ui/ui/tooltip";
 import { Html } from "@react-three/drei";
+import { DoorClosed, DoorOpen } from "lucide-react";
 import { useEffect } from "react";
 import { type Object3D } from "three";
 import { v4 as uuidv4 } from "uuid";
@@ -19,6 +22,7 @@ export default function TransferZones() {
   const { auth } = useAuthStore();
   const { transferZones, playerCurrentTransferZone } = useSceneStore();
   const { handleZoneAndPositionChange } = usePlayers();
+  const { players } = usePlayerStore();
 
   useEffect(() => {
     // socket?.on(WebSocketEvents.ZONE_TRANSFER_REQUEST, (data: any) => {
@@ -65,6 +69,11 @@ export default function TransferZones() {
   // TODO: Delete the transfer zone's original placeholder child
   return transferZones.map(placeholder => {
     const isIntersecting = playerCurrentTransferZone?.userData.zone_identifier === placeholder.userData.zone_identifier;
+    const zoneData = placeholder.userData as ZoneTransferObjectProps;
+
+    // Find if someone is in the target zone
+    const playerInTargetZone = players.find(player => player.zone === zoneData.target_zone_name);
+    const buttonTooltip = zoneData.is_to_public ? "Leave" : playerInTargetZone ? "Knock" : "Enter";
 
     return <mesh
       key={placeholder.userData.zone_identifier}
@@ -74,19 +83,28 @@ export default function TransferZones() {
       <Html>
         {
           isIntersecting && (
-            <span className="absolute -top-32 w-20 h-12 rounded-lg -translate-x-1/2">
-              <Button onClick={(e) => {
-                e.stopPropagation();
-                handleKnock(isIntersecting, placeholder);
-              }} variant="secondary">
-                Knock
-              </Button>
+            <span className="absolute -left-[32px] w-[80px] h-[48px] rounded-lg -translate-x-1/2 -top-12">
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button onClick={(e) => {
+                      e.stopPropagation();
+                      handleKnock(isIntersecting, placeholder);
+                    }} className="bg-blue-500 hover:bg-blue-600">
+                      {
+                        playerInTargetZone ? <DoorClosed /> : <DoorOpen />
+                      }
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    { buttonTooltip }
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
             </span>
           )
         }
       </Html>
-      <boxGeometry args={[placeholder.scale.x * 2.1, placeholder.scale.y * 2.1, placeholder.scale.z * 2.1]} />
-      <meshBasicMaterial color={isIntersecting ? "red": "blue"} />
     </mesh>
   })
 }
