@@ -20,6 +20,9 @@ export default function VideoSection() {
     if (player.connectionId === thisPlayer.connectionId) return false;
     if (!player.video) return false; // Skip players with video disabled
     
+    // Also skip players if they are not in the same zone
+    if (player.zone !== thisPlayer.zone) return false;
+    
     const distance = (new Vector3(...player.position).distanceToSquared(new Vector3(...thisPlayer.position)));
     return distance <= PROXIMITY_THRESHOLD * PROXIMITY_THRESHOLD;
   });
