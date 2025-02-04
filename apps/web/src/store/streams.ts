@@ -136,8 +136,6 @@ export const useStreamsStore = create<StreamsState>((set, get) => ({
     } else {
       console.log('No local stream available');
     }
-
-    console.log(localStream?.getTracks());
   },
   
   toggleLocalVideo: async (peers, socket) => {

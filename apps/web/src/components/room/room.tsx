@@ -12,6 +12,8 @@ import { useAuthStore } from "@/web/store/auth";
 import UserCard from "@/web/components/dashboard/sidebar/user-card";
 import TransferZoneControls from "@/web/components/room/components/user/transfer-zone-controls";
 
+import { Toaster as SonnerToaster } from "@melo/ui/ui/sonner"; 
+
 export default function Room({
   roomId,
 }: {
@@ -27,6 +29,8 @@ export default function Room({
           <UserCard auth={auth} />
       </div>
       
+
+        <SonnerToaster richColors position="top-center" />
         <SocketConnection room={roomId}>
           <StreamsProvider>
             <PlayersProvider>

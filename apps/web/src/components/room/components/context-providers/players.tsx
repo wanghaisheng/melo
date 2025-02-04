@@ -3,10 +3,11 @@ import useGlobalStore from "@/web/store/global";
 import usePlayerStore from "@/web/store/players";
 import useSceneStore from "@/web/store/scene";
 import { WebSocketEvents } from "@melo/common/constants";
-import type { PlayerData } from "@melo/types";
+import type { PlayerData, ZoneTransferRequest } from "@melo/types";
 import React, { createContext, useContext, useEffect, useState } from "react";
-
+import { toast as sonnerToast } from "sonner";
 import * as THREE from "three";
+import Image from "next/image";
 
 const playersContext = createContext<PlayersContext | null>(null);
 
@@ -31,6 +32,7 @@ export default function PlayersProvider({
   const {
     setPlayers,
     players,
+    addTransferZoneRequest,
   } = usePlayerStore();
   const { transferZones } = useSceneStore();
   const { socket } = useGlobalStore();
@@ -51,6 +53,41 @@ export default function PlayersProvider({
     new Promise((r,_) => setTimeout(r, 300)).then(() => setLoading(false));
   }, [setPlayers, socket]);
 
+  useEffect(() => {
+    if(!socket) return console.error("Socket is not initialized");
+    
+    if (socket.isRegistered(WebSocketEvents.ZONE_TRANSFER_REQUEST)) return;
+
+    socket.on(WebSocketEvents.ZONE_TRANSFER_REQUEST, ({ request}: { request: ZoneTransferRequest}) => {
+
+      const players = usePlayerStore.getState().players;
+      
+      const requestingPlayer = players.find(player => player.connectionId, request.requestFrom );
+      if ( !requestingPlayer ) return console.error("Could not find requesting player in knock request" );
+      
+      sonnerToast.message(
+        <div className="flex items-center h-full w-full gap-3">
+          <div className="w-8 h-8 rounded-2xl overflow-hidden flex items-center justify-center">
+            {
+              requestingPlayer.photoURL !== null || requestingPlayer.photoURL!.trim() !== "" ? (
+                <Image src={requestingPlayer.photoURL! } alt="Profile picture of requesting player" width={50} height={50}/>
+              ) : (
+                <div className="h-full w-full bg-zinc-800 flex items-center justify-center">
+                  {
+                    requestingPlayer.displayName.slice(0,2).toUpperCase()
+                  }
+                </div>
+              )
+            }
+          </div>
+          {requestingPlayer.displayName} is knocking.
+        </div>
+      )
+      addTransferZoneRequest(request);
+
+    });
+  }, [socket]);
+  
   const handleUpdatePlayerData = (data: PlayerData) => {
     if(!socket) return console.error("Socket is not initialized");
 

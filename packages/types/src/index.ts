@@ -3,6 +3,8 @@ export type PlayerData = {
   connectionId: string;
   username: string;
   displayName: string;
+  photoURL: string | null;
+  
   position: [number, number, number];
   rotation: [number, number, number];
 

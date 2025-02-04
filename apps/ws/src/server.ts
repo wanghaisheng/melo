@@ -32,9 +32,11 @@ export default class Server extends BasePartyServer implements Party.Server {
       const {
         auth_uid,
         username,
+        photoURL,
       }: {
         auth_uid: string,
         username: string,
+        photoURL: string | null,
       } = data;
       
         // Assign position
@@ -45,6 +47,7 @@ export default class Server extends BasePartyServer implements Party.Server {
           connectionId: sender.id,
           username: username,
           displayName: username,
+          photoURL,
           position: [0,0,0],
           rotation: [0,0,0],
           video: false,
