@@ -58,12 +58,12 @@ export default function TransferZoneControls() {
     });
   }
 
-  const handleAcceptKnock = (transferZoneRequest: ZoneTransferRequest) => {
+  const handleResponseToKnock = (transferZoneRequest: ZoneTransferRequest, isAccept: boolean) => {
     if ( !socket || !(auth?.status === "auth") || !auth.user ) return;
 
     socket?.emit(WebSocketEvents.ZONE_TRANSFER_RESPONSE, {
       response: {
-        isAccept: true,
+        isAccept,
         transferRequest: transferZoneRequest,
         requestUser: transferZoneRequest.requestFrom,
         responseUser: auth.user.uid,
@@ -194,9 +194,12 @@ export default function TransferZoneControls() {
                             { requestingPlayer.displayName || requestingPlayer.username }
                           </span>
                         </span>
-                        <Button className="text-[9px] bg-rose-500 hover:bg-rose-600 py-0 px-2 h-6">Deny</Button>
                         <Button 
-                          onClick={() => handleAcceptKnock(transferZoneRequest)}
+                          onClick={() => handleResponseToKnock(transferZoneRequest, false)}
+                          className="text-[9px] bg-rose-500 hover:bg-rose-600 py-0 px-2 h-6"
+                          >Deny</Button>
+                        <Button 
+                          onClick={() => handleResponseToKnock(transferZoneRequest, true)}
                           className="text-[9px] bg-blue-500 hover:bg-blue-600 py-0 px-2 h-6"
                         >Accept</Button>
                       </div>
