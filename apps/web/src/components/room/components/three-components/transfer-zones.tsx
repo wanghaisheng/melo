@@ -31,8 +31,6 @@ export default function TransferZones() {
     if ( socket?.isRegistered(WebSocketEvents.ZONE_TRANSFER_RESPONSE) ) return;
     
     socket?.on(WebSocketEvents.ZONE_TRANSFER_RESPONSE, (data: any) => {
-      console.log(usePlayerStore.getState().transferZoneRequests)
-      
       const response = data.response as ZoneTransferResponse;
 
       const fromZoneProps = useSceneStore.getState().transferZones.find(zone => zone.userData.zone_identifier === response.transferRequest.zoneIdentifier.from)?.userData as ZoneTransferObjectProps | null;
