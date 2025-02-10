@@ -5,7 +5,7 @@ import useGlobalStore from "@/web/store/global";
 import usePlayerStore from "@/web/store/players";
 import useSceneStore from "@/web/store/scene";
 import { WebSocketEvents } from "@melo/common/constants";
-import type { ZoneTransferObjectProps, ZoneTransferRequest } from "@melo/types";
+import type { ZoneTransferObjectProps, ZoneTransferRequest, ZoneTransferResponse } from "@melo/types";
 import { Button } from "@melo/ui/ui/button";
 import { ChevronDown, DoorClosed, DoorOpen } from "lucide-react";
 
@@ -42,7 +42,7 @@ export default function TransferZoneControls() {
     // Emit a knock request to the server
     socket?.emit(WebSocketEvents.ZONE_TRANSFER_REQUEST, {
       request: {
-        requestFrom:auth.user.uid,
+        requestFrom: socket.id, // NOTE: Should be using auth_uid, but for debug release I'll be using connection id to have the app consider different tabs as different users
         requestId: uuidv4(),
         timestamp: Date.now(),
         zoneIdentifier: {
@@ -58,13 +58,31 @@ export default function TransferZoneControls() {
     });
   }
 
+  const handleAcceptKnock = (transferZoneRequest: ZoneTransferRequest) => {
+    if ( !socket || !(auth?.status === "auth") || !auth.user ) return;
+
+    socket?.emit(WebSocketEvents.ZONE_TRANSFER_RESPONSE, {
+      response: {
+        isAccept: true,
+        transferRequest: transferZoneRequest,
+        requestUser: transferZoneRequest.requestFrom,
+        responseUser: auth.user.uid,
+        responseId: uuidv4(),
+        timestamp: Date.now(),
+      } satisfies ZoneTransferResponse
+    });
+  }
+
   const transferZoneRequestsOfCurrentTransferZone = useMemo(() => {
     if (!playerCurrentTransferZone) return [];
 
     const zoneData = playerCurrentTransferZone.userData as ZoneTransferObjectProps;
+    console.log(transferZoneRequests);
     const transferZoneRequestsOfCurrentTransferZone = transferZoneRequests.filter(transferZoneRequest => {
       return transferZoneRequest.zoneIdentifier.to === zoneData.zone_identifier;
     });
+
+    console.log("Current", transferZoneRequestsOfCurrentTransferZone);
 
     return transferZoneRequestsOfCurrentTransferZone;
   }, [transferZoneRequests, playerCurrentTransferZone]);
@@ -139,8 +157,8 @@ export default function TransferZoneControls() {
               <ScrollArea>
                 {
                   transferZoneRequestsOfCurrentTransferZone.map(transferZoneRequest => {
-                    const requestingPlayer = players.find(player => player.auth_uid === transferZoneRequest.requestFrom);
-                    
+                    const requestingPlayer = players.find(player => player.connectionId === transferZoneRequest.requestFrom);
+
                     if ( !requestingPlayer ) return;
                     
                     return (
@@ -175,7 +193,10 @@ export default function TransferZoneControls() {
                           </span>
                         </span>
                         <Button className="text-[9px] bg-rose-500 hover:bg-rose-600 py-0 px-2 h-6">Deny</Button>
-                        <Button className="text-[9px] bg-blue-500 hover:bg-blue-600 py-0 px-2 h-6">Accept</Button>
+                        <Button 
+                          onClick={() => handleAcceptKnock(transferZoneRequest)}
+                          className="text-[9px] bg-blue-500 hover:bg-blue-600 py-0 px-2 h-6"
+                        >Accept</Button>
                       </div>
                     );
                   })
