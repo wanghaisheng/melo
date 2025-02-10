@@ -11,6 +11,7 @@ Interactive virtual spaces for remote teams to work, play, and connect.
 Melo is an immersive virtual workspace platform built with Next.js, Three.js, and WebRTC, allowing remote teams to collaborate in real-time within interactive 3D environments. Whether you're conducting team meetings, brainstorming sessions, or casual hangouts, Melo provides a seamless and engaging virtual experience.
 
 ## Update Screenshots
+![image](https://github.com/user-attachments/assets/b0b9fa08-33d1-40ee-b26c-db7a54396e90)
 ![image](https://github.com/user-attachments/assets/581478cb-6360-4757-8a98-5b54e873a3cb)
 ![image](https://github.com/user-attachments/assets/af762997-f87f-4d90-926d-b002a1a3eaf9)
 ![image](https://github.com/user-attachments/assets/836c0cc1-3e63-42b4-8692-afd2663b361c)
