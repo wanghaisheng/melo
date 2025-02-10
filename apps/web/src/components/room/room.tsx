@@ -30,7 +30,7 @@ export default function Room({
       </div>
       
 
-        <SonnerToaster richColors position="top-center" />
+        <SonnerToaster richColors position="bottom-right" />
         <SocketConnection room={roomId}>
           <StreamsProvider>
             <PlayersProvider>
