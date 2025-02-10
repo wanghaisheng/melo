@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="https://github.com/user-attachments/assets/270b6acf-3ab2-4406-ae04-5dfc52a299e0" alt="Melo Logo" />
+  <img src="https://github.com/user-attachments/assets/abc57795-fb03-4caf-a0b5-4303de5dd476" alt="Melo Logo" />
 </p>
 
 # Melo <img src="https://github.com/user-attachments/assets/f46ba003-97f8-4abe-92e7-bf183da25042" alt="Melo Logo" height="30" />
