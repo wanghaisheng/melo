@@ -1,4 +1,5 @@
 import { usePlayers } from "@/web/components/room/components/context-providers/players";
+import useLogs from "@/web/hooks/useLogs";
 import { useAuthStore } from "@/web/store/auth";
 import useGlobalStore from "@/web/store/global";
 import usePlayerStore from "@/web/store/players";
@@ -24,6 +25,7 @@ export default function TransferZones() {
   const { transferZones, playerCurrentTransferZone } = useSceneStore();
   const { handleZoneAndPositionChange } = usePlayers();
   const { players, removeTransferZoneRequest } = usePlayerStore(); 
+  const { addNewLog } = useLogs();
 
   const { camera } = useThree();
 
@@ -37,12 +39,22 @@ export default function TransferZones() {
 
       if (!fromZoneProps) return console.error("ERROR: Zone props not found");
 
-      handleZoneAndPositionChange(response.transferRequest.zone.to, [fromZoneProps.target_pos_x, fromZoneProps.target_pos_z, -fromZoneProps.target_pos_y]);  
+      if ( response.isAccept ) {
+        handleZoneAndPositionChange(response.transferRequest.zone.to, [fromZoneProps.target_pos_x, fromZoneProps.target_pos_z, -fromZoneProps.target_pos_y]);  
+      }
 
       // Get all the zone transfer request of this player
       const requests = usePlayerStore.getState().transferZoneRequests.filter(request => request.requestFrom === response.transferRequest.requestFrom);
       requests.forEach(request => {
         removeTransferZoneRequest(request.requestId);
+      });
+
+      const requestingPlayer = usePlayerStore.getState().players.find(player => player.connectionId === response.transferRequest.requestFrom);
+      if( !requestingPlayer ) return;
+      
+      addNewLog({
+          data: `${requestingPlayer?.displayName ?? requestingPlayer.username } ${response.isAccept ? "entered." : "was denied entry."}`,
+        level: response.isAccept ? "success" : "danger",
       });
     });
   }, []);
