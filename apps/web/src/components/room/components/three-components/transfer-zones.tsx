@@ -64,7 +64,7 @@ export default function TransferZones() {
       } satisfies ZoneTransferRequest
     });
   }
-  
+
   // TODO: Delete the transfer zone's original placeholder child
   return transferZones.map(placeholder => {
     const isIntersecting = playerCurrentTransferZone?.userData.zone_identifier === placeholder.userData.zone_identifier;
@@ -82,25 +82,27 @@ export default function TransferZones() {
       <Html>
         {
           isIntersecting && camera.zoom > ((DEFAULT_MIN_ZOOM + DEFAULT_MAX_ZOOM)/ 2) && (
-            <span className="absolute -left-[32px] w-[80px] h-[48px] rounded-lg -translate-x-1/2 -top-12">
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Button onClick={(e) => {
-                      e.stopPropagation();
-                      handleKnock(isIntersecting, placeholder);
-                    }} className="bg-blue-500 hover:bg-blue-600">
-                      {
-                        playerInTargetZone ? <DoorClosed /> : <DoorOpen />
-                      }
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>
-                    { buttonTooltip }
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-            </span>
+            <>
+              <span className="absolute -left-[32px] w-[80px] h-[48px] rounded-lg -translate-x-1/2 -top-12">
+                <TooltipProvider>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button onClick={(e) => {
+                        e.stopPropagation();
+                        handleKnock(isIntersecting, placeholder);
+                      }} className="bg-blue-500 hover:bg-blue-600">
+                        {
+                          playerInTargetZone ? <DoorClosed /> : <DoorOpen />
+                        }
+                      </Button>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      { buttonTooltip }
+                    </TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              </span>
+            </>
           )
         }
       </Html>
