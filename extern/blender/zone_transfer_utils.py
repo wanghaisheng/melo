@@ -77,6 +77,8 @@ def replace_zone_target_prop_with_target_position():
                     obj["target_pos_x"] = target_position.x
                     obj["target_pos_y"] = target_position.y
                     obj["target_pos_z"] = target_position.z
+                    obj["target_zone_name"] = target_obj["zone_name"]
+                    obj["target_zone_identifier"] = target_obj["zone_identifier"]
                 else:
                     print(
                         f"Warning: target_pos for {obj.name} is not an object reference"
@@ -103,6 +105,10 @@ def add_custom_properties_to_missing_objects():
         if "zone_name" not in obj.keys():
             obj["zone_name"] = ""
             print(f"Added zone_name to {obj.name}")
+
+        if "zone_identifier"  not in obj.keys():
+            obj["zone_identifier"] = ""
+            print(f"Added zone_identifier to {obj.name}")
 
         if "zone_target" not in obj.keys():
             obj["zone_target"] = None

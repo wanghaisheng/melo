@@ -4,6 +4,7 @@ import BasePartyServer from "@/ws/core/server-base";
 import { DEFAULT_ZONE_NAME, WebSocketEvents } from "@melo/common/constants";
 
 import type { PlayerData, ZoneTransferRequest, ZoneTransferResponse } from "@melo/types";
+import { v4 as uuidv4 } from "uuid";
 
 export default class Server extends BasePartyServer implements Party.Server {
   private users = new Map<string, PlayerData>();
@@ -31,9 +32,11 @@ export default class Server extends BasePartyServer implements Party.Server {
       const {
         auth_uid,
         username,
+        photoURL,
       }: {
         auth_uid: string,
         username: string,
+        photoURL: string | null,
       } = data;
       
         // Assign position
@@ -44,6 +47,7 @@ export default class Server extends BasePartyServer implements Party.Server {
           connectionId: sender.id,
           username: username,
           displayName: username,
+          photoURL,
           position: [0,0,0],
           rotation: [0,0,0],
           video: false,
@@ -84,6 +88,22 @@ export default class Server extends BasePartyServer implements Party.Server {
           playerIdsOfRequestedRoom.push(id);
         }
       }
+
+      if ( playerIdsOfRequestedRoom.length === 0 || knockRequest.goToPublic ) {
+        // Accept the request by system instead of user
+        
+        this.emitTo(WebSocketEvents.ZONE_TRANSFER_RESPONSE, {
+          response : {
+            transferRequest: knockRequest,
+            requestUser: conn.id,
+            isAccept: true,
+            responseId: uuidv4(),
+            responseUser: "system",
+            timestamp: Date.now(),
+          } as ZoneTransferResponse
+        }, [conn.id]);
+        return;
+      }
       
       this.emitTo(WebSocketEvents.ZONE_TRANSFER_REQUEST, data, playerIdsOfRequestedRoom)
     });
@@ -98,7 +118,7 @@ export default class Server extends BasePartyServer implements Party.Server {
       // Get the conn.ids of the users in the room that is being requested into
       const playerIdsOfRequestedRoom = [];
       for ( const [id, player] of this.users.entries() ) {
-        if ( player.zone === response.transferRequest.zone.to ) {
+        if ( player.zone === response.transferRequest.zoneIdentifier.to ) {
           playerIdsOfRequestedRoom.push(id);
         }
       }

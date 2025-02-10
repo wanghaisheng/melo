@@ -3,6 +3,8 @@ export type PlayerData = {
   connectionId: string;
   username: string;
   displayName: string;
+  photoURL: string | null;
+  
   position: [number, number, number];
   rotation: [number, number, number];
 
@@ -32,14 +34,31 @@ export type FirestoreRoom = {
   members: string[];
 }
 
+export type ZoneTransferObjectProps = {
+  is_to_public: boolean;
+  name: string;
+  target_pos_x: number;
+  target_pos_y: number;
+  target_pos_z: number;
+  target_zone_name: string;
+  zone_name: string;
+  zone_identifier: string;
+  target_zone_identifier: string;
+}
+
 // Knock Request
 export type ZoneTransferRequest = {
   requestId: string;
   timestamp: number;
+  goToPublic: boolean;
+  zoneIdentifier: {
+    from: string;
+    to: string;
+  };
   zone: {
     from: string;
     to: string;
-  },
+  };
   requestFrom: string;
 }
 

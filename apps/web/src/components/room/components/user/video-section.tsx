@@ -20,12 +20,15 @@ export default function VideoSection() {
     if (player.connectionId === thisPlayer.connectionId) return false;
     if (!player.video) return false; // Skip players with video disabled
     
+    // Also skip players if they are not in the same zone
+    if (player.zone !== thisPlayer.zone) return false;
+    
     const distance = (new Vector3(...player.position).distanceToSquared(new Vector3(...thisPlayer.position)));
     return distance <= PROXIMITY_THRESHOLD * PROXIMITY_THRESHOLD;
   });
 
   return (
-    <div className="absolute right-2 top-2 flex flex-col items-end gap-2 z-10 h-[100% - 0.5rem]">
+    <div className="absolute right-2 top-2 flex flex-col items-end gap-2 z-10 h-[100% - 0.5rem] select-none">
       {/* Local Video Stream */}
       <div className="relative w-52 h-32 rounded-lg overflow-hidden border-2">
         <VideoStream 
@@ -51,7 +54,7 @@ export default function VideoSection() {
             playerPosition={player.position}
             userPosition={thisPlayer.position}
             hasVideo={player.video}
-            hasAudio={player.audio}
+            hasAudio={player.audio && player.zone === thisPlayer.zone}
             disableDynamicVolume
           />
           <div className="absolute bottom-1 left-1 text-white text-sm bg-black/50 px-2 py-1 rounded">

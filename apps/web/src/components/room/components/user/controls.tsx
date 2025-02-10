@@ -41,6 +41,7 @@ export default function Controls() {
       text-white
 
       flex items-center gap-3
+      
   ">
     <ToggleIconButton
       tip="Toggle Audio"

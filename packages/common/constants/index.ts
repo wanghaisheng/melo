@@ -25,3 +25,5 @@ export const WebSocketEvents = {
 }
 
 export const DEFAULT_ZONE_NAME = "lobby";
+export const DEFAULT_MIN_ZOOM = 50;
+export const DEFAULT_MAX_ZOOM = 140;

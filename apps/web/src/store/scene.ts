@@ -7,6 +7,9 @@ interface SceneStore {
 
   setLights: (lights: THREE.Object3D[]) => void;
   setTransferZones: (doors: THREE.Object3D[]) => void;
+
+  // The transfer zone the player is currently standing on
+  playerCurrentTransferZone: THREE.Object3D | null;
 }
 
 const useSceneStore = create<SceneStore>((set) => ({
@@ -14,6 +17,8 @@ const useSceneStore = create<SceneStore>((set) => ({
   transferZones: [],
   setLights: (lights: THREE.Object3D[]) => set({ lights }),
   setTransferZones: (doors: THREE.Object3D[]) => set({ transferZones: doors }),
+
+  playerCurrentTransferZone: null,
 }));
 
 export default useSceneStore;
