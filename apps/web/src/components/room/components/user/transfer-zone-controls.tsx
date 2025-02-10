@@ -21,7 +21,7 @@ export default function TransferZoneControls() {
   // User has the option to either click the button beside the user character or this
 
   const { playerCurrentTransferZone } = useSceneStore();
-  const { players, transferZoneRequests } = usePlayerStore();
+  const { players, transferZoneRequests, removeTransferZoneRequest } = usePlayerStore();
   const { auth } = useAuthStore();
   const { socket } = useGlobalStore();
   
@@ -71,18 +71,20 @@ export default function TransferZoneControls() {
         timestamp: Date.now(),
       } satisfies ZoneTransferResponse
     });
+
+    const requests = usePlayerStore.getState().transferZoneRequests.filter(request => request.requestFrom === transferZoneRequest.requestFrom);
+    requests.forEach(request => {
+      removeTransferZoneRequest(request.requestId);
+    });
   }
 
   const transferZoneRequestsOfCurrentTransferZone = useMemo(() => {
     if (!playerCurrentTransferZone) return [];
 
     const zoneData = playerCurrentTransferZone.userData as ZoneTransferObjectProps;
-    console.log(transferZoneRequests);
     const transferZoneRequestsOfCurrentTransferZone = transferZoneRequests.filter(transferZoneRequest => {
       return transferZoneRequest.zoneIdentifier.to === zoneData.zone_identifier;
     });
-
-    console.log("Current", transferZoneRequestsOfCurrentTransferZone);
 
     return transferZoneRequestsOfCurrentTransferZone;
   }, [transferZoneRequests, playerCurrentTransferZone]);

@@ -23,7 +23,7 @@ export default function TransferZones() {
   const { auth } = useAuthStore();
   const { transferZones, playerCurrentTransferZone } = useSceneStore();
   const { handleZoneAndPositionChange } = usePlayers();
-  const { players } = usePlayerStore();
+  const { players, removeTransferZoneRequest } = usePlayerStore(); 
 
   const { camera } = useThree();
 
@@ -31,6 +31,8 @@ export default function TransferZones() {
     if ( socket?.isRegistered(WebSocketEvents.ZONE_TRANSFER_RESPONSE) ) return;
     
     socket?.on(WebSocketEvents.ZONE_TRANSFER_RESPONSE, (data: any) => {
+      console.log(usePlayerStore.getState().transferZoneRequests)
+      
       const response = data.response as ZoneTransferResponse;
 
       const fromZoneProps = useSceneStore.getState().transferZones.find(zone => zone.userData.zone_identifier === response.transferRequest.zoneIdentifier.from)?.userData as ZoneTransferObjectProps | null;
@@ -38,6 +40,12 @@ export default function TransferZones() {
       if (!fromZoneProps) return console.error("ERROR: Zone props not found");
 
       handleZoneAndPositionChange(response.transferRequest.zone.to, [fromZoneProps.target_pos_x, fromZoneProps.target_pos_z, -fromZoneProps.target_pos_y]);  
+
+      // Get all the zone transfer request of this player
+      const requests = usePlayerStore.getState().transferZoneRequests.filter(request => request.requestFrom === response.transferRequest.requestFrom);
+      requests.forEach(request => {
+        removeTransferZoneRequest(request.requestId);
+      });
     });
   }, []);
   
@@ -49,7 +57,7 @@ export default function TransferZones() {
     // Emit a knock request to the server
     socket?.emit(WebSocketEvents.ZONE_TRANSFER_REQUEST, {
       request: {
-        requestFrom:auth.user.uid,
+        requestFrom:socket.id,
         requestId: uuidv4(),
         timestamp: Date.now(),
         zoneIdentifier: {

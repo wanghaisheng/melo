@@ -30,7 +30,7 @@ export default function VideoSection() {
   return (
     <div className="absolute right-2 top-2 flex flex-col items-end gap-2 z-10 h-[100% - 0.5rem]">
       {/* Local Video Stream */}
-      <div className="relative w-52 h-32 rounded-lg overflow-hidden border-2">
+      <div className="relative w-52 h-32 rounded-lg overflow-hidden border-2 select-none">
         <VideoStream 
           stream={localStream} 
           isLocal 

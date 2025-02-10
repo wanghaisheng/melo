@@ -3,7 +3,7 @@ import useGlobalStore from "@/web/store/global";
 import usePlayerStore from "@/web/store/players";
 import useSceneStore from "@/web/store/scene";
 import { WebSocketEvents } from "@melo/common/constants";
-import type { PlayerData, ZoneTransferRequest } from "@melo/types";
+import type { PlayerData, ZoneTransferRequest, ZoneTransferResponse } from "@melo/types";
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { toast as sonnerToast } from "sonner";
 import * as THREE from "three";
